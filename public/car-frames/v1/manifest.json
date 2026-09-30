@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "frameCount": 120,
+  "defaultFrame": 1,
+  "keyframes": [
+    1,
+    30,
+    60,
+    90,
+    120
+  ],
+  "basePath": "/car-frames/v1",
+  "extension": "webp",
+  "profiles": {
+    "desktop": {
+      "directory": "desktop",
+      "width": 1600,
+      "quality": 80
+    },
+    "mobile": {
+      "directory": "mobile",
+      "width": 960,
+      "quality": 75
+    }
+  }
+}
