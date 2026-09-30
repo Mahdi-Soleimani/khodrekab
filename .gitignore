@@ -60,3 +60,12 @@ tmp/
 # Temporary files
 *.swp
 *.bak
+
+# Project specific ignores
+cookies.txt
+car-frames-source-backup/
+carno-blender-pipeline/
+tsconfig.tsbuildinfo
+*.sqlite
+*.sqlite-journal
+

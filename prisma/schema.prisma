@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  WAITLIST
+  EARLY_ACCESS
+  ACTIVE
+  BLOCKED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum ReferralStatus {
+  CREATED
+  SIGNED_UP
+  VERIFIED
+  CONVERTED
+}
+
+model User {
+  id             String       @id @default(cuid())
+  phone          String       @unique
+  phoneVerified  Boolean      @default(false)
+  status         UserStatus   @default(WAITLIST)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  waitlistEntry  WaitlistEntry?
+  paymentIntents PaymentIntent[]
+  referralsSent  Referral[]   @relation("inviter")
+  referralUsed   Referral?    @relation("invited")
+  events         Event[]
+}
+
+model WaitlistEntry {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  source         String?  // instagram, linkedin, direct, referral
+  referralCode   String   @unique
+  referredBy     String?  // userId of referrer
+  priorityScore  Int      @default(10)
+  joinedAt       DateTime @default(now())
+}
+
+model OTPVerification {
+  id         String   @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  verified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([phone, verified])
+}
+
+model PaymentIntent {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  amount          Int           // 299000
+  uniqueCode      Int           // 1-999
+  totalAmount     Int           // 299000 + uniqueCode
+  status          PaymentStatus @default(PENDING)
+  cardNumber      String?       // masked card used for payment
+  expiresAt       DateTime      // 15 min timeout
+  confirmedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  logs            PaymentLog[]
+
+  @@unique([uniqueCode, status]) // ensure unique codes among PENDING
+  @@index([status, totalAmount])
+}
+
+model PaymentLog {
+  id         String   @id @default(cuid())
+  paymentId  String
+  payment    PaymentIntent @relation(fields: [paymentId], references: [id])
+  action     String   // CREATED, PAGE_OPENED, CONFIRMED, EXPIRED, REFUNDED
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model Referral {
+  id            String         @id @default(cuid())
+  inviterId     String
+  inviter       User           @relation("inviter", fields: [inviterId], references: [id])
+  invitedUserId String?        @unique
+  invitedUser   User?          @relation("invited", fields: [invitedUserId], references: [id])
+  status        ReferralStatus @default(CREATED)
+  createdAt     DateTime       @default(now())
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  eventName  String
+  properties Json?
+  createdAt  DateTime @default(now())
+
+  @@index([eventName, createdAt])
+}
