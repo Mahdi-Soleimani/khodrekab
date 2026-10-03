@@ -1,31 +1,60 @@
 'use client';
 
 import React from 'react';
-import { CarnoExperience } from '../components/CarnoExperience';
 import { CinematicNav } from '@/components/cinematic/CinematicNav';
-
+import { CarnoExperience } from '../components/CarnoExperience';
+import { ProblemSection } from '../sections/ProblemSection';
+import { SampleAnalysisSection } from '../sections/SampleAnalysisSection';
+import { ThreeStepSection } from '../sections/ThreeStepSection';
 import { TrustSection } from '../sections/TrustSection';
-import { LeadCaptureSection } from '../sections/LeadCaptureSection';
+import { WaitlistSection } from '../sections/WaitlistSection';
+import { EarlyAccessSection } from '../sections/EarlyAccessSection';
+import { FAQSection } from '../sections/FAQSection';
+import { FooterSection } from '../sections/FooterSection';
 
 export function ProductLandingPage() {
   return (
-    <main className="flex flex-col min-h-screen bg-black" itemScope itemType="https://schema.org/Product">
-      <meta itemProp="name" content="Carno Interactive Vehicle Engine" />
-      <meta itemProp="description" content="A seamless 3D cinematic vehicle scrolling experience." />
+    <main 
+      dir="rtl"
+      className="flex flex-col min-h-screen bg-[#050814] text-white selection:bg-[#E31C4E] selection:text-white" 
+      itemScope 
+      itemType="https://schema.org/Product"
+    >
+      <meta itemProp="name" content="کارنو | سامانه تحلیل و ارزیابی هوشمند خودرو" />
+      <meta itemProp="description" content="کارنو؛ تحلیل هوشمند بازار خودرو و کشف فرصت‌های زیر قیمت بازار. با عدد، نه با حدس." />
       
-      {/* 1. Hero / Nav */}
+      {/* 1. Cinematic Navigation */}
       <header>
         <CinematicNav />
       </header>
 
-      {/* 2. Car Experience (Scroll Engine + Interactive Canvas + Hero Content) */}
+      {/* 2. Hero Car Experience (Scroll Engine + Interactive 120-frame Canvas + Story + CTA) */}
       <CarnoExperience />
-      
-      {/* 3. Trust & Social Proof */}
+
+      {/* 3. Problem Section (بزرگترین اشتباه هنگام خرید خودرو چیست؟) */}
+      <ProblemSection />
+
+      {/* 4. Sample Analysis Section (نمونه تحلیل Carno با برچسب نمونه نمایشی) */}
+      <SampleAnalysisSection />
+
+      {/* 5. Three-Step Explanation (نحوه کارکرد کارنو در سه گام ساده) */}
+      <ThreeStepSection />
+
+      {/* 6. Trust Layer (هویت تیم جی‌هاب، مرحله محصول، حریم خصوصی شماره همراه) */}
       <TrustSection />
-      
-      {/* 4. Conversion / Lead Capture */}
-      <LeadCaptureSection />
+
+      {/* 7. Waitlist Registration (ثبت‌نام شماره همراه + OTP واقعی + نمایش رتبه حقیقی) */}
+      <WaitlistSection />
+
+      {/* 8. Early Access (دسترسی نسل اول + پیش‌نمایش تست پرداخت بدون تراکنش مالی) */}
+      <EarlyAccessSection />
+
+      {/* 9. FAQ Section (سوالات متداول پیرامون کارکرد و شفافیت) */}
+      <FAQSection />
+
+      {/* 10. Footer Section (فوتر برند، کپی‌رایت جی‌هاب و راه‌های تماس) */}
+      <FooterSection />
     </main>
   );
 }
+

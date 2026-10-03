@@ -110,20 +110,10 @@ export default function WaitlistPage() {
         </Card>
 
         <Card className="flex flex-col gap-4">
-          <h3 className="h3 !font-size-lg">آخرین کاربران پیوسته به لیست</h3>
-          <ul className="flex flex-col gap-3">
-            {[
-              { phone: '0912***4512', time: 'دقایقی پیش' },
-              { phone: '0935***7890', time: 'دقایقی پیش' },
-              { phone: '0913***1234', time: '۱ ساعت پیش' },
-              { phone: '0919***5678', time: '۲ ساعت پیش' },
-            ].map((user, i) => (
-              <li key={i} className="flex justify-between items-center text-small p-3 bg-[var(--color-bg-tertiary)] rounded-md border border-[var(--color-border-light)]">
-                <span className="dir-ltr font-mono">{user.phone}</span>
-                <span className="text-[var(--color-text-tertiary)] text-xs">{user.time}</span>
-              </li>
-            ))}
-          </ul>
+          <h3 className="h3 !font-size-lg">وضعیت صف کاربران</h3>
+          <p className="text-small text-[var(--color-text-secondary)]">
+            در حال تشکیل اولین گروه کاربران کارنو. دعوت‌نامه‌ها بر اساس اولویت ثبت‌نام و امتیاز معرفی ارسال خواهند شد.
+          </p>
         </Card>
 
       </div>
