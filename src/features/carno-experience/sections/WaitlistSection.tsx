@@ -14,6 +14,7 @@ interface WaitlistStatusData {
 export function WaitlistSection() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  const [maskedPhone, setMaskedPhone] = useState('');
   const [step, setStep] = useState<'phone' | 'otp' | 'verified'>('phone');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,8 +42,8 @@ export function WaitlistSection() {
     setError('');
 
     const cleanPhone = phone.trim();
-    if (!/^09\d{9}$/.test(cleanPhone)) {
-      setError('لطفاً شماره موبایل معتبر ۱۱ رقمی با ۰۹ وارد کنید.');
+    if (!cleanPhone) {
+      setError('لطفاً شماره موبایل را وارد کنید.');
       return;
     }
 
@@ -62,6 +63,7 @@ export function WaitlistSection() {
         setError(data.error || 'خطایی در ارسال کد رخ داد.');
       } else {
         posthog.capture('otp_sent');
+        setMaskedPhone(data.maskedPhone || '');
         setStep('otp');
       }
     } catch {
@@ -208,7 +210,7 @@ export function WaitlistSection() {
             </h2>
             <div className="text-sm text-slate-400 mb-8 flex items-center gap-2">
               <span>کد ارسال‌شده به</span>
-              <span className="font-mono text-white font-bold" dir="ltr">{phone}</span>
+              <span className="font-mono text-white font-bold" dir="ltr">{maskedPhone || phone}</span>
               <button
                 type="button"
                 onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
@@ -225,7 +227,7 @@ export function WaitlistSection() {
                 dir="ltr"
                 inputMode="numeric"
                 autoFocus
-                placeholder="• • • •"
+                placeholder="• • • • •"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 disabled={loading}
