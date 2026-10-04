@@ -82,5 +82,7 @@ tsconfig.tsbuildinfo
 *.sqlite
 *.sqlite-journal
 *.db
+*.sql
+backup-before-c1.sql
 
 

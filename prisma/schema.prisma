@@ -56,15 +56,24 @@ model WaitlistEntry {
 }
 
 model OTPVerification {
-  id         String   @id @default(cuid())
-  phone      String
-  codeHash   String
-  expiresAt  DateTime
-  attempts   Int      @default(0)
-  verified   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id            String   @id @default(cuid())
+  phone         String
+  codeHash      String
+  expiresAt     DateTime
+  attempts      Int      @default(0)
+  verified      Boolean  @default(false)
+  pepperVersion Int      @default(1)
+  createdAt     DateTime @default(now())
 
   @@index([phone, verified])
+}
+
+model OtpFailureCounter {
+  phoneHash   String    @id
+  windowStart DateTime
+  failCount   Int       @default(0)
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
 }
 
 model PaymentIntent {

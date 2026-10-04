@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import posthog from 'posthog-js';
 import { CarnoAnalytics } from '../hooks/useCarnoExperience';
 
@@ -9,6 +9,28 @@ interface WaitlistStatusData {
   refCode: string;
   referralCount: number;
   status: string;
+}
+
+async function solvePoWClient(challenge: string, difficulty: number): Promise<string> {
+  try {
+    const targetPrefix = '0'.repeat(difficulty);
+    const encoder = new TextEncoder();
+    let candidate = 0;
+    while (candidate < 500000) {
+      const candidateStr = candidate.toString();
+      const data = encoder.encode(`${challenge}:${candidateStr}`);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      if (hashHex.startsWith(targetPrefix)) {
+        return candidateStr;
+      }
+      candidate++;
+    }
+    return '0';
+  } catch {
+    return '0';
+  }
 }
 
 export function WaitlistSection() {
@@ -20,6 +42,17 @@ export function WaitlistSection() {
   const [error, setError] = useState('');
   const [statusData, setStatusData] = useState<WaitlistStatusData | null>(null);
   const [copied, setCopied] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const [honeypot, setHoneypot] = useState('');
+  const mountTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   // Check if user is already verified on mount
   useEffect(() => {
@@ -37,8 +70,8 @@ export function WaitlistSection() {
       });
   }, []);
 
-  const handlePhoneSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePhoneSubmit = useCallback(async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError('');
 
     const cleanPhone = phone.trim();
@@ -52,10 +85,27 @@ export function WaitlistSection() {
     CarnoAnalytics.track('registration_started', { source: 'waitlist_section' });
 
     try {
+      let powPayload: { challenge: string; solution: string } | undefined;
+      try {
+        const chalRes = await fetch('/api/waitlist/challenge');
+        if (chalRes.ok) {
+          const { challenge, difficulty } = await chalRes.json();
+          const solution = await solvePoWClient(challenge, difficulty || 3);
+          powPayload = { challenge, solution };
+        }
+      } catch {}
+
+      const fillTimeMs = Date.now() - mountTimeRef.current;
+
       const res = await fetch('/api/waitlist/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: cleanPhone }),
+        body: JSON.stringify({
+          phone: cleanPhone,
+          pow: powPayload,
+          _hp: honeypot,
+          fillTimeMs,
+        }),
       });
 
       const data = await res.json();
@@ -64,6 +114,7 @@ export function WaitlistSection() {
       } else {
         posthog.capture('otp_sent');
         setMaskedPhone(data.maskedPhone || '');
+        setCooldown(data.cooldownSeconds || 60);
         setStep('otp');
       }
     } catch {
@@ -71,7 +122,7 @@ export function WaitlistSection() {
     } finally {
       setLoading(false);
     }
-  }, [phone]);
+  }, [phone, honeypot]);
 
   const handleOtpSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +214,16 @@ export function WaitlistSection() {
             </p>
 
             <form onSubmit={handlePhoneSubmit} className="w-full max-w-md flex flex-col gap-4">
+              <input
+                type="text"
+                name="_hp"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ display: 'none' }}
+                aria-hidden="true"
+              />
               <div className="flex flex-col gap-2 text-right">
                 <label htmlFor="phone-input" className="text-xs font-medium text-slate-300 pr-1">
                   شماره موبایل
@@ -249,6 +310,24 @@ export function WaitlistSection() {
               >
                 {loading ? 'در حال بررسی کد...' : 'تأیید و ثبت جایگاه'}
               </button>
+
+              <div className="flex flex-col items-center gap-2 mt-4 text-xs text-slate-400">
+                {cooldown > 0 ? (
+                  <span>ارسال مجدد کد تا {cooldown} ثانیه دیگر</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handlePhoneSubmit()}
+                    disabled={loading}
+                    className="text-[#E31C4E] hover:underline cursor-pointer font-medium"
+                  >
+                    ارسال مجدد کد
+                  </button>
+                )}
+                <span className="text-[11px] text-slate-500">
+                  اگر شماره درست باشد، کد ارسال می‌شود. دریافت پیامک ممکن است تا ۲ دقیقه زمان ببرد.
+                </span>
+              </div>
             </form>
           </div>
         )}
