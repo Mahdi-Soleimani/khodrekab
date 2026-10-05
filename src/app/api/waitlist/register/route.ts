@@ -7,9 +7,19 @@ import { checkSmsRateLimits } from '@/lib/security/limiter';
 import { verifyPoWSolution, validateHoneypotAndTiming } from '@/lib/security/pow';
 import { computeOtpHash } from '@/lib/security/otp';
 import { enqueueSmsDispatch } from '@/lib/security/queue';
+import { validateOrigin } from '@/lib/security/origin';
 
 export async function POST(req: Request) {
   try {
+    // 0. Origin validation
+    const originCheck = validateOrigin(req);
+    if (!originCheck.valid) {
+      return NextResponse.json(
+        { error: 'درخواست نامعتبر از مبدأ غیرمجاز شناسایی شد.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const { phone: rawPhone, pow, _hp, fillTimeMs } = body;
 

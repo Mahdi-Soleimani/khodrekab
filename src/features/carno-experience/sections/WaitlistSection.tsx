@@ -177,7 +177,8 @@ export function WaitlistSection() {
 
   const copyReferralLink = useCallback(() => {
     if (!statusData?.refCode) return;
-    const link = `https://carno.app/?ref=${statusData.refCode}`;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+    const link = `${baseUrl}/?ref=${statusData.refCode}`;
     navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
       posthog.capture('referral_link_copied');
@@ -381,7 +382,7 @@ export function WaitlistSection() {
                   <input
                     readOnly
                     dir="ltr"
-                    value={`https://carno.app/?ref=${statusData.refCode}`}
+                    value={`${process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/?ref=${statusData.refCode}`}
                     className="flex-1 px-4 py-3 bg-[#050814] border border-slate-700 rounded-xl text-xs text-slate-300 font-mono text-left outline-none"
                   />
                   <button

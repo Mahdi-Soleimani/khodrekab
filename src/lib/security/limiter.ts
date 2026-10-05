@@ -333,3 +333,48 @@ export async function checkSmsRateLimits(params: {
     return { allowed: true, cooldownSeconds: 60 };
   }
 }
+
+/**
+ * Per-userId rate limiter for /api/waitlist/status:
+ * 60 requests per minute per userId.
+ * Fail closed: if Redis is unavailable or times out, returns status 503.
+ */
+export async function checkStatusRateLimit(userId: string): Promise<{
+  allowed: boolean;
+  status?: number;
+  error?: string;
+}> {
+  const redis = getRedisClient();
+  if (!redis) {
+    return {
+      allowed: false,
+      status: 503,
+      error: 'سرویس موقتاً در دسترس نیست. لطفاً دقایقی دیگر تلاش کنید.',
+    };
+  }
+
+  const key = `rl:status:${userId}`;
+  try {
+    const count = await redis.incr(key);
+    if (count === 1) {
+      await redis.expire(key, 60);
+    }
+
+    if (count > 60) {
+      return {
+        allowed: false,
+        status: 429,
+        error: 'تعداد درخواست‌ها بیش از حد مجاز است. لطفاً یک دقیقه دیگر تلاش کنید.',
+      };
+    }
+
+    return { allowed: true };
+  } catch (err: any) {
+    console.error(`[STATUS_LIMITER_FAIL_CLOSED] Redis error for user ${userId}:`, err.message);
+    return {
+      allowed: false,
+      status: 503,
+      error: 'سرویس موقتاً در دسترس نیست. لطفاً دقایقی دیگر تلاش کنید.',
+    };
+  }
+}

@@ -52,7 +52,8 @@ export default function WaitlistPage() {
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://carno.app/?ref=${refCode}`);
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+    navigator.clipboard.writeText(`${baseUrl}/?ref=${refCode}`);
     alert('لینک کپی شد!');
   };
 
@@ -101,7 +102,7 @@ export default function WaitlistPage() {
           <div className="flex gap-2">
             <input 
               readOnly 
-              value={`https://carno.app/?ref=${refCode}`} 
+              value={`${process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/?ref=${refCode}`} 
               className="flex-1 px-3 py-2 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md text-left text-sm"
               dir="ltr"
             />

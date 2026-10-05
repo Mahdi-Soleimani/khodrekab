@@ -1,15 +1,25 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcryptjs';
 import { normalizeIranianPhone, convertDigitsToEnglish, maskPhone } from '@/lib/sms/phone';
 import { computeOtpHash, verifyOtpTimingSafe, checkOtpLockout, recordOtpFailure, clearOtpFailure } from '@/lib/security/otp';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
+import { createSession } from '@/lib/security/session';
+import { validateOrigin } from '@/lib/security/origin';
+import { resolveClientIp } from '@/lib/security/ip';
 
 export async function POST(req: Request) {
   try {
+    // 0. Origin validation (CSRF defense)
+    const originCheck = validateOrigin(req);
+    if (!originCheck.valid) {
+      return NextResponse.json(
+        { error: 'درخواست نامعتبر از مبدأ غیرمجاز شناسایی شد.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const { phone, otp, referredByCode, source } = body;
 
@@ -137,26 +147,92 @@ export async function POST(req: Request) {
           where: { referralCode: String(referredByCode).trim() },
         });
 
+        // 1. Self-referral blocking: Inviter cannot be the invited user
         if (inviterEntry && inviterEntry.userId !== user.id) {
           inviterId = inviterEntry.userId;
 
-          // Increment inviter priority score by 50
-          await prisma.waitlistEntry.update({
-            where: { id: inviterEntry.id },
-            data: { priorityScore: { increment: 50 } },
-          });
+          const clientIp = resolveClientIp(req);
+          const clientIpHash = clientIp ? crypto.createHash('sha256').update(clientIp).digest('hex') : null;
+          const userAgent = req.headers.get('user-agent');
+          const clientDeviceHash = userAgent ? crypto.createHash('sha256').update(userAgent).digest('hex') : null;
 
-          await prisma.referral
-            .create({
-              data: {
-                inviterId,
-                invitedUserId: user.id,
-                status: 'CONVERTED',
-              },
-            })
-            .catch(() => {
-              // Ignore duplicate referral record errors gracefully
+          // Check if inviter has active session or activity with the same ipHash in the last 1 hour
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+          const sameIpCluster = clientIpHash
+            ? await prisma.session.findFirst({
+                where: {
+                  userId: inviterEntry.userId,
+                  ipHash: clientIpHash,
+                  createdAt: { gte: oneHourAgo },
+                },
+              })
+            : null;
+
+          // 2. Atomic Velocity Cap and Point Isolation (count CONVERTED in 24h + create in 1 transaction)
+          try {
+            await prisma.$transaction(async (tx) => {
+              const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+              const recentConvertedCount = await tx.referral.count({
+                where: {
+                  inviterId: inviterEntry.userId,
+                  status: 'CONVERTED',
+                  createdAt: { gte: twentyFourHoursAgo },
+                },
+              });
+
+              if (sameIpCluster) {
+                // IP cluster collision: Flagged, points held (pending review), no pendingScore increment
+                await tx.referral.create({
+                  data: {
+                    inviterId: inviterEntry.userId,
+                    invitedUserId: user.id,
+                    status: 'CONVERTED',
+                    isFlagged: true,
+                    isMatured: false,
+                    maturesAt: null,
+                    ipHash: clientIpHash,
+                    deviceHash: clientDeviceHash,
+                  },
+                });
+              } else if (recentConvertedCount >= 20) {
+                // Velocity cap exceeded (>=20/day): Flagged high volume, points held, no pendingScore increment
+                await tx.referral.create({
+                  data: {
+                    inviterId: inviterEntry.userId,
+                    invitedUserId: user.id,
+                    status: 'FLAGGED_HIGH_VOLUME',
+                    isFlagged: true,
+                    isMatured: false,
+                    maturesAt: null,
+                    ipHash: clientIpHash,
+                    deviceHash: clientDeviceHash,
+                  },
+                });
+              } else {
+                // Valid referral: 24h maturity, increment pendingScore (NOT priorityScore)
+                await tx.waitlistEntry.update({
+                  where: { id: inviterEntry.id },
+                  data: { pendingScore: { increment: 50 } },
+                });
+
+                await tx.referral.create({
+                  data: {
+                    inviterId: inviterEntry.userId,
+                    invitedUserId: user.id,
+                    status: 'CONVERTED',
+                    isFlagged: false,
+                    isMatured: false,
+                    maturesAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+                    ipHash: clientIpHash,
+                    deviceHash: clientDeviceHash,
+                  },
+                });
+              }
             });
+          } catch (refErr: any) {
+            // P2002: unique constraint failed on invitedUserId (duplicate referral)
+            console.warn(`[REFERRAL_SKIP] Duplicate or concurrent referral attempt for user ${user.id}:`, refErr.message);
+          }
         }
       }
 
@@ -170,10 +246,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // 8. Sign secure JWT session token
-    const token = jwt.sign({ id: user.id, phone: user.phone }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    // 8. Create stateful session (2-hour lifetime, HS256)
+    const sessionResult = await createSession(user.id, req);
 
     console.log(`[AUTH_SUCCESS] OTP verified for ${masked}`);
 
@@ -182,14 +256,11 @@ export async function POST(req: Request) {
       message: 'تایید موفقیت‌آمیز',
     });
 
-    // 9. Attach secure httpOnly cookie
-    response.cookies.set('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/',
-    });
+    // 9. Attach secure session cookie
+    response.cookies.set(sessionResult.cookieConfig.name, sessionResult.token, sessionResult.cookieConfig);
+
+    // 10. Delete legacy token cookie if present
+    response.cookies.set('token', '', { path: '/', maxAge: 0 });
 
     return response;
   } catch (error) {

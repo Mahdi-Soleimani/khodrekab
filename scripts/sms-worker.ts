@@ -6,6 +6,9 @@
  * Handles SIGTERM / SIGINT for graceful shutdown without losing in-flight jobs.
  */
 
+import { loadEnvConfig } from '@next/env';
+loadEnvConfig(process.cwd());
+
 import Redis from 'ioredis';
 import { processNextJob, reapStaleProcessingJobs, getSmsPayloadKey } from '../src/lib/security/queue';
 

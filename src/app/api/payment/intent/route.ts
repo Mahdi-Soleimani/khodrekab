@@ -1,27 +1,31 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
+import { validateSession } from '@/lib/security/session';
+import { validateOrigin } from '@/lib/security/origin';
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'احراز هویت نشده است' }, { status: 401 });
+    const originCheck = validateOrigin(req);
+    if (!originCheck.valid) {
+      return NextResponse.json(
+        { error: 'درخواست نامعتبر از مبدأ غیرمجاز شناسایی شد.' },
+        { status: 403 }
+      );
     }
 
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET);
-    } catch (e) {
-      return NextResponse.json({ error: 'توکن نامعتبر است' }, { status: 401 });
+    const auth = await validateSession(req);
+    if (!auth.valid || !auth.userId) {
+      const response = NextResponse.json(
+        { error: 'نشست کاربری شما منقضی شده است. لطفاً دوباره وارد شوید.' },
+        { status: auth.status || 401 }
+      );
+      if (auth.shouldDeleteLegacy) {
+        response.cookies.set('token', '', { path: '/', maxAge: 0 });
+      }
+      return response;
     }
 
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    const user = await prisma.user.findUnique({ where: { id: auth.userId } });
 
     if (!user) {
       return NextResponse.json({ error: 'کاربر یافت نشد' }, { status: 404 });
