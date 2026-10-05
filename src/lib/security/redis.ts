@@ -18,7 +18,7 @@ export function getRedisClient(): Redis | null {
   try {
     redisInstance = new Redis(redisUrl, {
       connectTimeout: 500,
-      commandTimeout: 500,
+      commandTimeout: 250,
       maxRetriesPerRequest: 1,
       retryStrategy(times) {
         // Continuous backoff up to 2 seconds so connection auto-heals after Redis restarts

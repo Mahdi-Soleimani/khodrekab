@@ -9,6 +9,17 @@ import { getRedisClient, closeRedisConnection } from '../src/lib/security/redis'
 import { smsService } from '../src/lib/sms';
 import { prisma } from '../src/lib/prisma';
 
+// Read SMS_ENCRYPTION_KEY from environment or test fallback for runner
+if (!process.env.SMS_ENCRYPTION_KEY) {
+  try {
+    const { loadEnvConfig } = require('@next/env');
+    loadEnvConfig(process.cwd());
+  } catch {}
+}
+if (!process.env.SMS_ENCRYPTION_KEY) {
+  process.env.SMS_ENCRYPTION_KEY = crypto.randomBytes(32).toString('hex');
+}
+
 async function runReviewTests() {
   console.log('====================================================');
   console.log('    CARNO C1 REVIEW: RIGOROUS REAL TESTS SUITE     ');

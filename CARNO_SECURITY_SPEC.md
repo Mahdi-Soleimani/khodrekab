@@ -5,7 +5,7 @@
 > **Repository:** `radifo-khodro-landing`  
 > **Base Branch:** `conversion-redesign` (Clean commit: `aeb5da2`)  
 > **Active Work Branch:** `security-hardening`  
-> **Status:** Phase B Revised (Gate 2 Approved with Corrections) — Specification Only (Zero Code, Zero DB Changes)  
+> **Status:** Phase C1 implemented and committed; Phase C1.5 approved and implemented  
 > **Document Purpose:** Complete technical specification and implementation blueprint for security hardening of Carno across OTP, SMS, waitlist, referral, session, payment, PII, headers, and observability under strict Iran-First constraints.
 
 ---
@@ -677,16 +677,18 @@ Testing must be executed locally without contacting external third-party gateway
 
 ### B.13 Rollout & Rollback Architecture (Phases C1 – C4)
 
-```text
-Phase C1: SMS Abuse Protection & OTP Hardening
+Phase C1: SMS Abuse Protection & OTP Hardening [COMMITTED]
   ├── Scope: /api/waitlist/register, /api/waitlist/verify, in-house PoW, ioredis limiter,
   │          verify fail-closed (A1 b), trusted-IP resolver (A3), MeliPayamak only (A4)
-  ├── Migration: Additive column pepperVersion to OTPVerification
-  │          (+ OtpFailureCounter table ONLY if A1 c backstop is approved)
-  ├── Out of scope (A4): secondary SMS provider, real alert channels, analytics, fonts,
-  │          CSP/headers, session/JWT, referral, PII encryption, payment, Telegram link,
-  │          Sample Analysis card
+  ├── Note on Worker: C1 in-process drain worker was dev-grade; production-grade per P11 (Phase C1.5)
+  ├── Migration: Additive column pepperVersion to OTPVerification (+ OtpFailureCounter table)
   └── Rollback: Revert C1 commit; database change is backward-compatible
+
+Phase C1.5: Reliable Redis SMS Queue & Standalone Worker (P11) [APPROVED & IMPLEMENTED]
+  ├── Scope: Reliable Redis LMOVE queue, visibility timeout reaper, standalone worker process,
+  │          AES-256-GCM encrypted payload, post-send deduplication, UX-2 resend flow
+  ├── Out of scope: New endpoints, secondary SMS provider, real SMS tests
+  └── Rollback: Stop standalone worker; queue drains or reverts to C1
 
 Phase C2: Payment Webhook Security & Code Pool Fixes
   ├── Scope: /api/payment/intent, /api/payment/webhook, code pool recycling
@@ -791,8 +793,22 @@ The following items are officially classified as `PENDING` awaiting human stakeh
 - **[P8] Authorization for Database Encryption:** Explicit approval to apply additive encryption columns in Phase C4.
 - **[P9] Security Contact & Official Domain:** Confirm official domain (e.g. `carno.ir` vs `carno.app`) and security contact email for `security.txt`.
 - **[P10] Sample Analysis Card (A6):** Choose option 1, 2 or 3 in Section 4.1 before public launch.
-- **[P11] Pre-Launch SMS Queue & Worker Hardening (TODO قبل از انتشار عمومی):** انتخاب نهایی معماری صف پیامک قبل از انتشار عمومی: (۱) صف توزیع‌شده‌ی کاملاً قابل‌اتکا با استفاده از الگوی `BRPOPLPUSH` / `RPOPLPUSH` و پردازشگر مجزا (Standalone Worker Daemon) با لیست processing و بازیابی jobهای معلق پس از راه‌اندازی مجدد سرور، یا (۲) بازگشت به ارسال مستقیم در همان درخواست با سقف زمانی سخت (Strict Timeout).
-- **[UX-C1] بهبود پیام خطای ارسال پیامک:** اضافه کردن بررسی وضعیت در کلاینت؛ چنانچه `sms:status = failed` باشد، به جای اتکای صرف به فعال‌سازی زودهنگام دکمه، پیام صریح «ارسال کد با مشکل مواجه شد، دوباره تلاش کنید» نمایش داده شود.
+- **[P11] Pre-Launch SMS Queue & Worker Hardening (APPROVED — Option A Implemented in Phase C1.5):**
+  - **Architecture:** Reliable Redis queue with atomic `LMOVE`/`BLMOVE` (`sms:dispatch:queue` -> `sms:dispatch:processing`), ACK on completion, visibility timeout + reaper daemon, executed by a standalone worker process (`scripts/sms-worker.ts`) using a dedicated Redis connection without the 250ms web client `commandTimeout`.
+  - **(a) OTP Payload Protection in Redis:**
+    - Algorithm: AES-256-GCM (Node.js built-in `crypto`).
+    - Key Variable Name: `SMS_ENCRYPTION_KEY` (32 bytes raw or 64 hex characters). Strict fail-closed: NO derivation from `OTP_PEPPER`, NO fallback dev constants. If missing or shorter than 32 bytes, fails closed and throws immediately in every environment.
+    - Key Location: Server environment variable only (never committed, never in queue payload).
+    - Payload Key: `sms:payload:<jobId>` with TTL = 180 seconds.
+    - Lifecycle & Deletion: Encrypted payload is written at enqueue time. Read by worker to dispatch. Hard-deleted with `DEL sms:payload:<jobId>` immediately on ACK and on dead-lettering.
+  - **(b) Deduplication & Failure Semantics:**
+    - Governing Rule: *"A duplicate SMS is acceptable, a lost SMS is not."*
+    - Dedupe Key: `sms:dedupe:<challengeId>` with TTL = 300s.
+    - Writing Timing: The dedupe key is written **AFTER** the gateway call returns success (or concurrently with ACK).
+    - Failure Case 1 ("Worker dies before send"): Since the dedupe key is not yet written, the reaper spots the unacked job in `sms:dispatch:processing` exceeding the 45s visibility timeout, increments `attempts`, and re-queues it via `LMOVE`. The next worker retrieves the job and dispatches the SMS. Zero SMS loss.
+    - Failure Case 2 ("Sent but not acked" / worker dies post-send before ACK): If the dedupe key was set upon successful gateway response, the re-queued job inspects the dedupe key, acknowledges without double-sending, and drops the job. If the worker died before setting the dedupe key, the job is re-dispatched (duplicate delivery is accepted over lost delivery).
+- **[UX-C1] ارسال مجدد و بازخورد کاربر (APPROVED — Option 2):**
+  - هیچ اندپوینت پولینگ یا وضعیت جدیدی اضافه نمی‌شود (حفظ سادگی و کارایی در اینترنت ناپایدار ایران). کلاینت به تایمر معکوس ۶۰ ثانیه‌ای و دکمه «ارسال مجدد کد» اتکا می‌کند. در صورت شکست نهایی صف، کلید کول‌داون ردیس حذف می‌شود تا کاربر بتواند بلافاصله درخواست جدید ثبت کند، در حالی که سقف‌های ساعتی و روزانه حفظ می‌شوند.
 
 **Gate 2 Approved Items Recorded:**
 - PostgreSQL backstop for OTP lockout (A1 c): **APPROVED**
@@ -827,5 +843,5 @@ git diff --stat -- src/features/carno-experience/engine public/car-frames
 # Output: (empty — 0 files changed)
 ```
 
-**PHASE B REVISION + AMENDMENTS A1–A6 COMPLETE.**  
-Work is now **STOPPED**. Awaiting explicit human instruction: `"Approved — proceed to C1 implementation"`.
+**PHASE B REVISION + AMENDMENTS A1–A6 + PHASE C1 + PHASE C1.5 COMPLETE.**  
+Work on Phase C1.5 is documented. Awaiting human verification of C1.5 test report.
