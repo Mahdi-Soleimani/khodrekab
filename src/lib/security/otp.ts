@@ -20,6 +20,29 @@ const WINDOW_DURATION_MS = 60 * 60 * 1000; // 1 hour
 // In-memory counter fallback for local development only
 const devFailCounters = new Map<string, { count: number; lockedUntil?: number }>();
 
+type OtpFailureCounterStore = {
+  otpFailureCounter: {
+    findUnique(args: { where: { phoneHash: string } }): Promise<{
+      phoneHash: string;
+      windowStart: Date;
+      failCount: number;
+      lockedUntil: Date | null;
+    } | null>;
+    upsert(args: {
+      where: { phoneHash: string };
+      create: { phoneHash: string; windowStart: Date; failCount: number };
+      update: { windowStart: Date; failCount: number; lockedUntil: Date | null };
+    }): Promise<unknown>;
+    update(args: {
+      where: { phoneHash: string };
+      data: { failCount: number; lockedUntil: Date | null };
+    }): Promise<unknown>;
+    delete(args: { where: { phoneHash: string } }): Promise<unknown>;
+  };
+};
+
+const counterPrisma = prisma as unknown as OtpFailureCounterStore;
+
 export function getPhoneHash(phone: string): string {
   return crypto
     .createHmac('sha256', getOtpPepper())
@@ -86,7 +109,7 @@ export async function checkOtpLockout(phone: string): Promise<{ locked: boolean;
       const res = await Promise.race([readPromise, timeoutPromise]);
       redisCount = res.val ? parseInt(res.val, 10) : 0;
       redisTtl = res.ttl > 0 ? res.ttl : 0;
-    } catch (err) {
+    } catch {
       if (process.env.NODE_ENV === 'production') {
         throw new Error('FAIL_CLOSED: Failed to read Redis lockout counter');
       }
@@ -98,7 +121,7 @@ export async function checkOtpLockout(phone: string): Promise<{ locked: boolean;
   let postgresLockedUntil: Date | null = null;
 
   try {
-    const dbPromise = prisma.otpFailureCounter.findUnique({
+    const dbPromise = counterPrisma.otpFailureCounter.findUnique({
       where: { phoneHash },
     });
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -113,7 +136,7 @@ export async function checkOtpLockout(phone: string): Promise<{ locked: boolean;
       }
       postgresLockedUntil = dbRecord.lockedUntil;
     }
-  } catch (err) {
+  } catch {
     // If PostgreSQL fails in production, fail closed
     if (process.env.NODE_ENV === 'production') {
       throw new Error('FAIL_CLOSED: Failed to read PostgreSQL lockout backstop');
@@ -176,7 +199,7 @@ export async function recordOtpFailure(phone: string): Promise<void> {
         await redis.expire(key, LOCKOUT_DURATION_SECONDS); // 30 min lock
       }
       redisSuccess = true;
-    } catch (err) {
+    } catch {
       if (process.env.NODE_ENV === 'production') {
         throw new Error('FAIL_CLOSED: Failed to write Redis failure increment');
       }
@@ -187,12 +210,12 @@ export async function recordOtpFailure(phone: string): Promise<void> {
   let postgresSuccess = false;
   try {
     const now = new Date();
-    const existing = await prisma.otpFailureCounter.findUnique({
+    const existing = await counterPrisma.otpFailureCounter.findUnique({
       where: { phoneHash },
     });
 
     if (!existing || now.getTime() - existing.windowStart.getTime() > WINDOW_DURATION_MS) {
-      await prisma.otpFailureCounter.upsert({
+      await counterPrisma.otpFailureCounter.upsert({
         where: { phoneHash },
         create: {
           phoneHash,
@@ -212,7 +235,7 @@ export async function recordOtpFailure(phone: string): Promise<void> {
           ? new Date(now.getTime() + LOCKOUT_DURATION_SECONDS * 1000)
           : null;
 
-      await prisma.otpFailureCounter.update({
+      await counterPrisma.otpFailureCounter.update({
         where: { phoneHash },
         data: {
           failCount: nextCount,
@@ -221,7 +244,7 @@ export async function recordOtpFailure(phone: string): Promise<void> {
       });
     }
     postgresSuccess = true;
-  } catch (err) {
+  } catch {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('FAIL_CLOSED: Failed to write PostgreSQL failure increment');
     }
@@ -254,7 +277,7 @@ export async function clearOtpFailure(phone: string): Promise<void> {
   }
 
   try {
-    await prisma.otpFailureCounter.delete({
+    await counterPrisma.otpFailureCounter.delete({
       where: { phoneHash },
     }).catch(() => {});
   } catch {
