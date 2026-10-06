@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 
 export default function WaitlistPage() {
   const [rank, setRank] = useState<number | null>(null);
@@ -23,10 +22,6 @@ export default function WaitlistPage() {
           setRank(data.data.rank);
           setRefCode(data.data.refCode);
           setStatus(data.data.status);
-          posthog.capture('waitlist_dashboard_viewed', { rank: data.data.rank, status: data.data.status });
-          if (data.data.status === 'WAITLIST') {
-            posthog.capture('early_access_view');
-          }
         }
       })
       .catch(() => router.push('/'))
@@ -35,7 +30,6 @@ export default function WaitlistPage() {
 
   const handleEarlyAccess = async () => {
     setPaymentLoading(true);
-    posthog.capture('payment_started');
     try {
       const res = await fetch('/api/payment/intent', { method: 'POST' });
       const data = await res.json();
@@ -52,7 +46,8 @@ export default function WaitlistPage() {
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://carno.app/?ref=${refCode}`);
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+    navigator.clipboard.writeText(`${baseUrl}/?ref=${refCode}`);
     alert('لینک کپی شد!');
   };
 
@@ -101,7 +96,7 @@ export default function WaitlistPage() {
           <div className="flex gap-2">
             <input 
               readOnly 
-              value={`https://carno.app/?ref=${refCode}`} 
+              value={`${process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/?ref=${refCode}`} 
               className="flex-1 px-3 py-2 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md text-left text-sm"
               dir="ltr"
             />

@@ -27,6 +27,7 @@ enum ReferralStatus {
   SIGNED_UP
   VERIFIED
   CONVERTED
+  FLAGGED_HIGH_VOLUME
 }
 
 model User {
@@ -41,6 +42,7 @@ model User {
   paymentIntents PaymentIntent[]
   referralsSent  Referral[]   @relation("inviter")
   referralUsed   Referral?    @relation("invited")
+  sessions       Session[]
   events         Event[]
 }
 
@@ -52,19 +54,29 @@ model WaitlistEntry {
   referralCode   String   @unique
   referredBy     String?  // userId of referrer
   priorityScore  Int      @default(10)
+  pendingScore   Int      @default(0)
   joinedAt       DateTime @default(now())
 }
 
 model OTPVerification {
-  id         String   @id @default(cuid())
-  phone      String
-  codeHash   String
-  expiresAt  DateTime
-  attempts   Int      @default(0)
-  verified   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id            String   @id @default(cuid())
+  phone         String
+  codeHash      String
+  expiresAt     DateTime
+  attempts      Int      @default(0)
+  verified      Boolean  @default(false)
+  pepperVersion Int      @default(1)
+  createdAt     DateTime @default(now())
 
   @@index([phone, verified])
+}
+
+model OtpFailureCounter {
+  phoneHash   String    @id
+  windowStart DateTime
+  failCount   Int       @default(0)
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
 }
 
 model PaymentIntent {
@@ -103,7 +115,31 @@ model Referral {
   invitedUserId String?        @unique
   invitedUser   User?          @relation("invited", fields: [invitedUserId], references: [id])
   status        ReferralStatus @default(CREATED)
+  ipHash        String?
+  deviceHash    String?
+  isFlagged     Boolean        @default(false)
+  isMatured     Boolean        @default(false)
+  maturesAt     DateTime?
   createdAt     DateTime       @default(now())
+
+  @@index([inviterId, isMatured, maturesAt])
+  @@index([inviterId, createdAt])
+}
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jti           String    @unique
+  ipHash        String?
+  userAgentHash String?
+  revokedAt     DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Event {

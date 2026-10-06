@@ -92,3 +92,6 @@ cookies.txt
 *.sqlite-journal
 *.db
 
+*.sql
+backup-*.sql
+backup-before-c1.sql

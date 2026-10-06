@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 
 export default function PaymentPage() {
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 mins default
@@ -49,7 +48,6 @@ export default function PaymentPage() {
         const data = await res.json();
         if (data?.data?.status === 'EARLY_ACCESS') {
           setStatus('PAID');
-          posthog.capture('payment_success');
           if (pollingRef.current) clearInterval(pollingRef.current);
         }
       } catch (e) {}
@@ -70,7 +68,6 @@ export default function PaymentPage() {
   };
 
   const retryPayment = async () => {
-    posthog.capture('payment_started');
     const res = await fetch('/api/payment/intent', { method: 'POST' });
     const data = await res.json();
     if (data.success) {

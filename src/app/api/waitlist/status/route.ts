@@ -1,31 +1,39 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
+import { validateSession } from '@/lib/security/session';
+import { checkStatusRateLimit } from '@/lib/security/limiter';
 
 export async function GET(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'احراز هویت نشده است' }, { status: 401 });
+    // 1. Authenticate user from session (HS256 stateful session)
+    // CRITICAL: Unauthenticated requests get 401 BEFORE touching Redis!
+    const auth = await validateSession(req);
+    if (!auth.valid || !auth.userId) {
+      const response = NextResponse.json(
+        { error: 'نشست کاربری شما منقضی شده است. لطفاً دوباره وارد شوید.' },
+        { status: auth.status || 401 }
+      );
+      if (auth.shouldDeleteLegacy) {
+        response.cookies.set('token', '', { path: '/', maxAge: 0 });
+      }
+      return response;
     }
 
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET);
-    } catch (e) {
-      return NextResponse.json({ error: 'توکن نامعتبر است' }, { status: 401 });
+    // 2. Redis Rate Limiting (60 req/min per userId, 503 if Redis fails)
+    const rateLimit = await checkStatusRateLimit(auth.userId);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: rateLimit.error || 'تعداد درخواست‌ها بیش از حد مجاز است.' },
+        { status: rateLimit.status || 429 }
+      );
     }
 
+    // 3. Retrieve user and waitlist entry
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      include: { 
+      where: { id: auth.userId },
+      include: {
         waitlistEntry: true,
-        _count: { select: { referralsSent: true } } 
+        _count: { select: { referralsSent: true } },
       },
     });
 
@@ -33,35 +41,97 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'کاربر یا لیست انتظار یافت نشد' }, { status: 404 });
     }
 
-    // Rank based on priority score (descending) and join date (ascending)
+    // 4. Lazy-on-read maturity settlement for current user's referrals
+    try {
+      const maturedReferrals = await prisma.referral.findMany({
+        where: {
+          inviterId: user.id,
+          isMatured: false,
+          isFlagged: false,
+          maturesAt: { lte: new Date() },
+        },
+        select: { id: true },
+      });
+
+      if (maturedReferrals.length > 0) {
+        const scoreToAdd = maturedReferrals.length * 50;
+        const referralIds = maturedReferrals.map((r) => r.id);
+
+        // Ensure pendingScore never goes negative (Amendment 4)
+        const currentPending = user.waitlistEntry.pendingScore || 0;
+        const pendingDecrement = Math.min(currentPending, scoreToAdd);
+
+        await prisma.$transaction([
+          prisma.referral.updateMany({
+            where: { id: { in: referralIds } },
+            data: { isMatured: true },
+          }),
+          prisma.waitlistEntry.update({
+            where: { userId: user.id },
+            data: {
+              priorityScore: { increment: scoreToAdd },
+              pendingScore: { decrement: pendingDecrement },
+            },
+          }),
+        ]);
+
+        user.waitlistEntry.priorityScore += scoreToAdd;
+        user.waitlistEntry.pendingScore = Math.max(0, currentPending - pendingDecrement);
+      }
+    } catch (settleErr: any) {
+      if (settleErr.code === 'P2021' || settleErr.code === 'P2022') {
+        return NextResponse.json(
+          { error: 'سرویس موقتاً در دسترس نیست (مایگریشن دیتابیس در حال انجام است).' },
+          { status: 503 }
+        );
+      }
+      console.warn(`[LAZY_MATURITY_WARN] Could not settle referrals for user ${user.id}:`, settleErr.message);
+    }
+
+    // 5. Rank query based on priorityScore (descending) and joinedAt (ascending)
+    // Note: pendingScore is strictly isolated and excluded from rank calculation!
     const usersAhead = await prisma.waitlistEntry.count({
       where: {
         OR: [
           { priorityScore: { gt: user.waitlistEntry.priorityScore } },
           {
             priorityScore: user.waitlistEntry.priorityScore,
-            joinedAt: { lt: user.waitlistEntry.joinedAt }
-          }
-        ]
-      }
+            joinedAt: { lt: user.waitlistEntry.joinedAt },
+          },
+        ],
+      },
     });
 
     let currentRank = usersAhead + 1;
 
     if (user.status === 'EARLY_ACCESS') {
-      currentRank = Math.min(currentRank, 1000); 
+      currentRank = Math.min(currentRank, 1000);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         rank: currentRank,
         refCode: user.waitlistEntry.referralCode,
         referralCount: user._count.referralsSent,
         status: user.status,
-      }
+        priorityScore: user.waitlistEntry.priorityScore,
+        pendingScore: user.waitlistEntry.pendingScore,
+      },
     });
-  } catch (error) {
+
+    if (auth.shouldDeleteLegacy) {
+      response.cookies.set('token', '', { path: '/', maxAge: 0 });
+    }
+
+    return response;
+  } catch (error: any) {
+    if (error.code === 'P2021' || error.code === 'P2022') {
+      return NextResponse.json(
+        { error: 'سرویس موقتاً در دسترس نیست (مایگریشن دیتابیس در حال انجام است).' },
+        { status: 503 }
+      );
+    }
     console.error('Error in /api/waitlist/status:', error);
     return NextResponse.json({ error: 'خطای سرور' }, { status: 500 });
   }

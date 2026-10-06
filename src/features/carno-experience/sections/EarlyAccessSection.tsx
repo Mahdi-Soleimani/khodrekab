@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import posthog from 'posthog-js';
 import { CarnoAnalytics } from '../hooks/useCarnoExperience';
 
 export function EarlyAccessSection() {
   const [showTestModal, setShowTestModal] = useState(false);
 
   const handleCtaClick = useCallback(() => {
-    posthog.capture('early_access_clicked');
     CarnoAnalytics.track('early_access_clicked');
     setShowTestModal(true);
   }, []);
