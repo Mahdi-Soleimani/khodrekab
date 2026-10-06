@@ -2,13 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 
 export function Hero() {
   const router = useRouter();
 
   const handleCTA = () => {
-    posthog.capture('hero_cta_click');
     const waitlistEl = document.getElementById('waitlist');
     if (waitlistEl) {
       waitlistEl.scrollIntoView({ behavior: 'smooth' });

@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import posthog from 'posthog-js';
 
 export function Features() {
   const features = [
@@ -21,9 +20,7 @@ export function Features() {
     }
   ];
 
-  const handleFeatureClick = (title: string) => {
-    posthog.capture('feature_click', { feature: title });
-  };
+  const handleFeatureClick = (_title: string) => {};
 
   return (
     <section className="w-full py-32 px-6 bg-white relative">

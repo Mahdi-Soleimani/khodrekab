@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 
 export default function WaitlistPage() {
   const [rank, setRank] = useState<number | null>(null);
@@ -23,10 +22,6 @@ export default function WaitlistPage() {
           setRank(data.data.rank);
           setRefCode(data.data.refCode);
           setStatus(data.data.status);
-          posthog.capture('waitlist_dashboard_viewed', { rank: data.data.rank, status: data.data.status });
-          if (data.data.status === 'WAITLIST') {
-            posthog.capture('early_access_view');
-          }
         }
       })
       .catch(() => router.push('/'))
@@ -35,7 +30,6 @@ export default function WaitlistPage() {
 
   const handleEarlyAccess = async () => {
     setPaymentLoading(true);
-    posthog.capture('payment_started');
     try {
       const res = await fetch('/api/payment/intent', { method: 'POST' });
       const data = await res.json();

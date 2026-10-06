@@ -10,8 +10,10 @@ import { ProtectionTier } from '../engine/cache/types';
 
 export const CarnoAnalytics = {
   track: (eventName: string, payload?: Record<string, any>) => {
-    // Analytics abstraction, no direct library calls
-    console.debug(`[Carno Analytics] ${eventName}`, payload);
+    // Structured local logger - zero external network requests
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[Carno Analytics] ${eventName}`, payload);
+    }
   }
 };
 

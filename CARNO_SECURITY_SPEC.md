@@ -784,7 +784,7 @@ Audit of all external URLs discovered in the codebase:
 The following items are officially classified as `PENDING` awaiting human stakeholder decisions before implementation:
 
 - **[P1] Production Hosting Provider:** Which Iranian cloud/datacenter hosts the production instance (ArvanCloud, Asiatech, Afranet, Parspack)? **Also blocks:** the `TRUSTED_PROXY_CIDRS` list and trusted header name (A3), and therefore production rollout of the per-IP tier behind an edge.
-- **[P2] Analytics Strategy:** Should analytics default to zero external scripts, or will a self-hosted PostHog/Matomo server be deployed?
+- **[P2] Analytics Strategy (C4a Decision):** Analytics defaults to zero external scripts. Client runtime loading of PostHog Cloud, Google Analytics/Tag Manager, and Microsoft Clarity is removed. The existing `CarnoAnalytics` interface is retained as a local structured logger/no-op. Self-hosted server deployment (e.g. self-hosted PostHog/Matomo inside Iran) remains deferred pending infrastructure decisions.
 - **[P3] Formal Shaparak Gateway:** What is the target timeline for acquiring Enamad and migrating to an official IPG (ZarinPal, NextPay, IDPay)?
 - **[P4] Production Redis Availability (BLOCKS C1 PRODUCTION ROLLOUT):** Please confirm production Redis connection string and authentication password. *(Does not block local development).*
 - **[P5] Secondary SMS Provider:** Which secondary provider is preferred for failover (Kavenegar or Ghasedak)?
@@ -843,5 +843,9 @@ git diff --stat -- src/features/carno-experience/engine public/car-frames
 # Output: (empty — 0 files changed)
 ```
 
-**PHASE B REVISION + AMENDMENTS A1–A6 + PHASE C1 + PHASE C1.5 COMPLETE.**  
-Work on Phase C1.5 is documented. Awaiting human verification of C1.5 test report.
+**PHASE B REVISION + AMENDMENTS A1–A6 + PHASE C1 + PHASE C1.5 + PHASE C3 COMPLETE.**  
+- Phase C1 committed (`5dea4bd`).
+- Phase C1.5 committed (`11d1387`).
+- Phase C3 committed (`4a60236` and `6e0b808`).
+- **Phase C4a (Iran-First Assets, Analytics, Headers):** Brief prepared; awaiting explicit human approval (`Approved — implement C4a`).
+

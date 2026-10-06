@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import posthog from 'posthog-js';
 import { CarnoAnalytics } from '../hooks/useCarnoExperience';
 
 interface WaitlistStatusData {
@@ -81,7 +80,6 @@ export function WaitlistSection() {
     }
 
     setLoading(true);
-    posthog.capture('phone_submitted', { source: 'waitlist_section' });
     CarnoAnalytics.track('registration_started', { source: 'waitlist_section' });
 
     try {
@@ -112,7 +110,6 @@ export function WaitlistSection() {
       if (!res.ok || data.error) {
         setError(data.error || 'خطایی در ارسال کد رخ داد.');
       } else {
-        posthog.capture('otp_sent');
         setMaskedPhone(data.maskedPhone || '');
         setCooldown(data.cooldownSeconds || 60);
         setStep('otp');
@@ -156,7 +153,6 @@ export function WaitlistSection() {
       if (!res.ok || data.error) {
         setError(data.error || 'کد وارد شده اشتباه یا منقضی شده است.');
       } else {
-        posthog.capture('otp_verified');
         CarnoAnalytics.track('otp_verified');
 
         // Fetch real status
@@ -181,7 +177,6 @@ export function WaitlistSection() {
     const link = `${baseUrl}/?ref=${statusData.refCode}`;
     navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
-      posthog.capture('referral_link_copied');
       CarnoAnalytics.track('referral_shared', { refCode: statusData.refCode });
       setTimeout(() => setCopied(false), 3000);
     });

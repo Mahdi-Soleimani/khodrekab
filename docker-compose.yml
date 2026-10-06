@@ -6,13 +6,24 @@ services:
       - "3001:3000"
     env_file:
       - .env
-    environment:
+    environment: &app-env
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/carlanding
       - REDIS_URL=redis://redis:6379
     depends_on:
       - db
       - redis
       - n8n
+
+  worker:
+    build: .
+    command: npm run worker:sms
+    restart: "on-failure:5"
+    env_file:
+      - .env
+    environment: *app-env
+    depends_on:
+      - db
+      - redis
 
   db:
     image: postgres:16-alpine
