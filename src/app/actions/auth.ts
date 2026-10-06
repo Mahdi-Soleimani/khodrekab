@@ -1,45 +1,53 @@
 'use server';
 
-import { prisma } from '@/lib/prisma';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { nanoid } from 'nanoid';
+import { prisma } from '@/lib/prisma';
+import { smsService } from '@/lib/sms';
+import { normalizeIranianPhone, convertDigitsToEnglish, maskPhone } from '@/lib/sms/phone';
 
 export async function sendOtpAction(phoneNumber: string) {
   try {
-    // Generate 5 digit code
-    const code = Math.floor(10000 + Math.random() * 90000).toString();
+    const normalizedPhone = normalizeIranianPhone(phoneNumber);
+    if (!normalizedPhone) {
+      return { success: false, error: 'شماره موبایل وارد شده معتبر نیست. لطفاً شماره ۱۱ رقمی با ۰۹ وارد کنید.' };
+    }
+
+    // Generate cryptographically secure 5-digit code
+    const code = crypto.randomInt(10000, 100000).toString();
     const codeHash = await bcrypt.hash(code, 10);
     
-    // Create OTP record (expires in 2 minutes)
-    await prisma.oTPVerification.create({
+    // Invalidate prior pending challenges
+    await prisma.oTPVerification.updateMany({
+      where: { phone: normalizedPhone, verified: false },
+      data: { verified: true },
+    });
+
+    // Create OTP record (expires in 5 minutes)
+    const challenge = await prisma.oTPVerification.create({
       data: {
-        phone: phoneNumber,
+        phone: normalizedPhone,
         codeHash,
-        expiresAt: new Date(Date.now() + 2 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
       }
     });
 
-    // MeliPayamak API
-    const username = process.env.MELIPAYAMAK_USERNAME;
-    const password = process.env.MELIPAYAMAK_PASSWORD;
-    const from = process.env.MELIPAYAMAK_FROM;
-    
-    if (username && password && from) {
-      await fetch('https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          password,
-          text: code,
-          to: phoneNumber,
-          bodyId: 1234 // Replace with actual pattern ID
-        })
-      }).catch(e => console.error("SMS API Error:", e));
-    } else {
-      console.log(`\n======================================`);
-      console.log(`[DEV MODE] OTP Code for ${phoneNumber} is: ${code}`);
-      console.log(`======================================\n`);
+    // Dispatch via unified SMS service
+    const sendResult = await smsService.sendOtp({
+      phone: normalizedPhone,
+      code,
+    });
+
+    if (!sendResult.success) {
+      await prisma.oTPVerification.update({
+        where: { id: challenge.id },
+        data: { verified: true },
+      });
+      return {
+        success: false,
+        error: sendResult.userMessage || 'خطایی در ارسال کد رخ داد. لطفاً دوباره تلاش کنید.',
+      };
     }
 
     return { success: true };
@@ -51,9 +59,19 @@ export async function sendOtpAction(phoneNumber: string) {
 
 export async function verifyOtpAction(phoneNumber: string, code: string, referredByCode?: string | null, source?: string | null) {
   try {
+    const normalizedPhone = normalizeIranianPhone(phoneNumber);
+    if (!normalizedPhone) {
+      return { success: false, error: 'شماره موبایل نامعتبر است.' };
+    }
+
+    const cleanCode = convertDigitsToEnglish(code ? String(code).trim() : '');
+    if (!cleanCode) {
+      return { success: false, error: 'کد تایید وارد نشده است.' };
+    }
+
     // Find latest OTP for phone
     const otp = await prisma.oTPVerification.findFirst({
-      where: { phone: phoneNumber, verified: false },
+      where: { phone: normalizedPhone, verified: false },
       orderBy: { createdAt: 'desc' }
     });
 
@@ -67,7 +85,7 @@ export async function verifyOtpAction(phoneNumber: string, code: string, referre
       return { success: false, error: 'تعداد دفعات مجاز به پایان رسیده است.' };
     }
 
-    const isValid = await bcrypt.compare(code, otp.codeHash);
+    const isValid = await bcrypt.compare(cleanCode, otp.codeHash);
     
     if (!isValid) {
       await prisma.oTPVerification.update({

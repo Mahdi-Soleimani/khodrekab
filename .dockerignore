@@ -1,7 +1,14 @@
 # Version control
 .git
 .gitignore
+.gitattributes
 .github
+
+# Docker & Container files
+Dockerfile*
+docker-compose*
+.dockerignore
+.docker/
 
 # Dependencies
 node_modules
@@ -9,17 +16,23 @@ node_modules
 .pnp
 .pnp.js
 
-# Development files
+# Development & Editor files
 .vscode
 .idea
 .cursorrules
 .cursor
 .antigravity
+.agents
+.claude
 
-# Environment
+# Environment & Secrets
 .env
 .env.*
 !.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .local
 
 # Build artifacts generated locally
@@ -58,9 +71,24 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Temporary files
+# Temporary files & Caches
 .cache
 .eslintcache
 .stylelintcache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 temp
 tmp
+*.swp
+*.swo
+*.bak
+*~
+
+# Project specific heavy assets & local database files
+car-frames-source-backup/
+carno-blender-pipeline/
+cookies.txt
+*.sqlite
+*.sqlite-journal
+*.db
+

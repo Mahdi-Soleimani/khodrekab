@@ -1,50 +1,68 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/Button';
 
 export function CinematicNav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 40);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToWaitlist = () => {
-    document.getElementById('waitlist-section')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-      scrolled 
-        ? 'bg-white/90 backdrop-blur-xl border-b border-black/[0.04] py-3' 
-        : 'bg-transparent py-6'
-    }`}>
-      <div className="container flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#E31C3D] rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-black">C</span>
+    <nav 
+      aria-label="منوی اصلی"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-[#050814]/85 backdrop-blur-xl border-b border-slate-800/80 py-3 shadow-lg shadow-black/40' 
+          : 'bg-gradient-to-b from-black/80 via-black/30 to-transparent py-5'
+      }`}
+    >
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+        {/* Brand / Logo */}
+        <div 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex items-center gap-3 cursor-pointer group"
+        >
+          <div className="w-8 h-8 bg-[#E31C4E] rounded-lg flex items-center justify-center font-black text-white text-base shadow-md shadow-[#E31C4E]/30 group-hover:scale-105 transition-transform">
+            C
           </div>
-          <span className="text-xl font-black text-[#111111] tracking-tight">کارنو</span>
+          <div className="flex flex-col">
+            <span className="text-xl font-black text-white tracking-tight">کارنو</span>
+            <span className="text-[10px] text-slate-400 font-medium -mt-1 hidden sm:inline">با عدد، نه با حدس</span>
+          </div>
         </div>
         
-        {/* CTA */}
-        <div className="flex items-center gap-6">
+        {/* Navigation Links & Action */}
+        <div className="flex items-center gap-5 sm:gap-7">
           <button 
-            onClick={scrollToWaitlist} 
-            className="text-sm font-medium text-[#666666] hover:text-[#111111] transition-colors hidden sm:block"
+            onClick={() => scrollTo('sample-analysis')} 
+            className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
-            نسخه اول
+            نمونه تحلیل
           </button>
-          <Button size="sm" onClick={scrollToWaitlist}>
+          <button 
+            onClick={() => scrollTo('early-access')} 
+            className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer hidden md:block"
+          >
+            دسترسی نسل اول
+          </button>
+          <button
+            onClick={() => scrollTo('waitlist-registration')}
+            className="bg-[#E31C4E] hover:bg-[#C21641] text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-full shadow-md shadow-[#E31C4E]/20 transition-all duration-200 active:scale-95 cursor-pointer"
+          >
             دریافت دسترسی اولیه
-          </Button>
+          </button>
         </div>
       </div>
     </nav>
   );
 }
+
