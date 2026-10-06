@@ -94,10 +94,6 @@ export function DashboardHeader({ maskedPhone, avatarUrl }: DashboardHeaderProps
 
           {/* Right Profile Controls */}
           <div className="flex items-center gap-4">
-            <bdi dir="ltr" className="hidden sm:inline-block font-mono text-sm text-slate-100 font-bold bg-[#0a0e1a] px-4 py-2 rounded-xl border border-slate-700/80 shadow-inner">
-              {maskedPhone}
-            </bdi>
-
             {/* Profile Avatar & Dropdown */}
             <div className="relative">
               <button 
