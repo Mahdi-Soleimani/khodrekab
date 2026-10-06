@@ -3,12 +3,23 @@ import { useState, useEffect } from 'react';
 
 export function CinematicNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
     };
     window.addEventListener('scroll', handleScroll);
+
+    fetch('/api/waitlist/status')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(() => {});
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -54,12 +65,22 @@ export function CinematicNav() {
           >
             دسترسی نسل اول
           </button>
-          <button
-            onClick={() => scrollTo('waitlist-registration')}
-            className="bg-[#E31C4E] hover:bg-[#C21641] text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-full shadow-md shadow-[#E31C4E]/20 transition-all duration-200 active:scale-95 cursor-pointer"
-          >
-            دریافت دسترسی اولیه
-          </button>
+          {isAuthenticated ? (
+            <a
+              href="/dashboard"
+              className="bg-[#E31C4E] hover:bg-[#C21641] text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-full shadow-md shadow-[#E31C4E]/20 transition-all duration-200 active:scale-95 flex items-center gap-1.5"
+            >
+              <span>ورود به داشبورد</span>
+              <span className="text-xs">←</span>
+            </a>
+          ) : (
+            <button
+              onClick={() => scrollTo('waitlist-registration')}
+              className="bg-[#E31C4E] hover:bg-[#C21641] text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-full shadow-md shadow-[#E31C4E]/20 transition-all duration-200 active:scale-95 cursor-pointer"
+            >
+              دریافت دسترسی اولیه
+            </button>
+          )}
         </div>
       </div>
     </nav>

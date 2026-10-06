@@ -36,3 +36,23 @@ export async function POST(req: Request) {
 
   return response;
 }
+
+export async function GET(req: Request) {
+  const auth = await validateSession(req);
+  if (auth.valid && auth.jti) {
+    await revokeSession(auth.jti);
+  }
+
+  const response = NextResponse.redirect(new URL('/', req.url));
+  const cookieConfig = getSessionCookieConfig();
+  response.cookies.set(cookieConfig.name, '', {
+    ...cookieConfig,
+    maxAge: 0,
+  });
+  response.cookies.set('token', '', {
+    path: '/',
+    maxAge: 0,
+  });
+
+  return response;
+}

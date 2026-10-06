@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
 import { resolveClientIp } from './ip';
 
-export const SESSION_LIFETIME_SECONDS = 7200; // 2 hours (Amendment D-F)
+export const SESSION_LIFETIME_SECONDS = 2592000; // 30 days (1 month persistent session)
 
 export interface SessionCookieConfig {
   name: string;
@@ -131,48 +131,20 @@ export interface SessionValidationResult {
   valid: boolean;
   userId?: string;
   jti?: string;
-  session?: any;
+  session?: unknown;
   code?: 'UNAUTHENTICATED' | 'LEGACY_TOKEN_REJECTED' | 'INVALID_JWT' | 'SESSION_REVOKED_OR_EXPIRED' | 'DB_MIGRATION_PENDING';
   status?: number;
   shouldDeleteLegacy?: boolean;
 }
 
 /**
- * Validates session from incoming Request or cookie header.
- * Fail-closed: missing session, revoked session, or legacy token returns 401.
- * Missing DB table/column returns 503.
+ * Validates a session token directly.
  */
-export async function validateSession(req: Request): Promise<SessionValidationResult> {
-  const cookieHeader = req.headers.get('cookie');
-  const cookies = parseCookiesFromHeader(cookieHeader);
-
-  const cookieConfig = getSessionCookieConfig();
-  const sessionToken = cookies[cookieConfig.name];
-  const legacyToken = cookies['token'];
-
-  const hasLegacy = Boolean(legacyToken);
-
-  if (!sessionToken) {
-    if (hasLegacy) {
-      return {
-        valid: false,
-        code: 'LEGACY_TOKEN_REJECTED',
-        status: 401,
-        shouldDeleteLegacy: true,
-      };
-    }
-    return {
-      valid: false,
-      code: 'UNAUTHENTICATED',
-      status: 401,
-      shouldDeleteLegacy: false,
-    };
-  }
-
+export async function validateSessionToken(token: string): Promise<SessionValidationResult> {
   let decoded: { userId: string; jti: string };
   try {
     const secret = getJwtSecret();
-    decoded = jwt.verify(sessionToken, secret, {
+    decoded = jwt.verify(token, secret, {
       algorithms: ['HS256'],
     }) as { userId: string; jti: string };
   } catch {
@@ -180,7 +152,6 @@ export async function validateSession(req: Request): Promise<SessionValidationRe
       valid: false,
       code: 'INVALID_JWT',
       status: 401,
-      shouldDeleteLegacy: hasLegacy,
     };
   }
 
@@ -189,7 +160,6 @@ export async function validateSession(req: Request): Promise<SessionValidationRe
       valid: false,
       code: 'INVALID_JWT',
       status: 401,
-      shouldDeleteLegacy: hasLegacy,
     };
   }
 
@@ -203,7 +173,6 @@ export async function validateSession(req: Request): Promise<SessionValidationRe
         valid: false,
         code: 'SESSION_REVOKED_OR_EXPIRED',
         status: 401,
-        shouldDeleteLegacy: hasLegacy,
       };
     }
 
@@ -212,20 +181,46 @@ export async function validateSession(req: Request): Promise<SessionValidationRe
       userId: decoded.userId,
       jti: decoded.jti,
       session,
-      shouldDeleteLegacy: hasLegacy,
     };
-  } catch (err: any) {
-    // If Session table does not exist yet (migration pending) -> fail closed with 503
-    if (err.code === 'P2021' || err.code === 'P2022' || err.message?.includes('does not exist')) {
+  } catch (err: unknown) {
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'P2021' || errorObj?.code === 'P2022' || errorObj?.message?.includes('does not exist')) {
       return {
         valid: false,
         code: 'DB_MIGRATION_PENDING',
         status: 503,
-        shouldDeleteLegacy: hasLegacy,
       };
     }
     throw err;
   }
+}
+
+/**
+ * Validates session from incoming Request or cookie header.
+ * Fail-closed: missing session, revoked session, or legacy token returns 401.
+ * Missing DB table/column returns 503.
+ */
+export async function validateSession(req: Request): Promise<SessionValidationResult> {
+  const cookieHeader = req.headers.get('cookie');
+  const cookies = parseCookiesFromHeader(cookieHeader);
+
+  const cookieConfig = getSessionCookieConfig();
+  const sessionToken = cookies[cookieConfig.name] || cookies['carno_session'] || cookies['__Host-carno_session'] || cookies['token'];
+
+  if (!sessionToken) {
+    return {
+      valid: false,
+      code: 'UNAUTHENTICATED',
+      status: 401,
+      shouldDeleteLegacy: false,
+    };
+  }
+
+  const res = await validateSessionToken(sessionToken);
+  return {
+    ...res,
+    shouldDeleteLegacy: !res.valid && Boolean(cookies['token']),
+  };
 }
 
 /**

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { CarnoAnalytics } from '../hooks/useCarnoExperience';
 
 interface WaitlistStatusData {
@@ -36,14 +37,20 @@ export function WaitlistSection() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [maskedPhone, setMaskedPhone] = useState('');
-  const [step, setStep] = useState<'phone' | 'otp' | 'verified'>('phone');
+  const router = useRouter();
+  const [step, setStep] = useState<'phone' | 'otp' | 'verified' | 'transition'>('phone');
+  const [successGreeting, setSuccessGreeting] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [statusData, setStatusData] = useState<WaitlistStatusData | null>(null);
   const [copied, setCopied] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [honeypot, setHoneypot] = useState('');
-  const mountTimeRef = useRef(Date.now());
+  const mountTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    mountTimeRef.current = Date.now();
+  }, []);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -154,15 +161,12 @@ export function WaitlistSection() {
         setError(data.error || 'کد وارد شده اشتباه یا منقضی شده است.');
       } else {
         CarnoAnalytics.track('otp_verified');
-
-        // Fetch real status
-        const statusRes = await fetch('/api/waitlist/status');
-        const statusJson = await statusRes.json();
-        if (statusJson.success && statusJson.data) {
-          setStatusData(statusJson.data);
-          CarnoAnalytics.track('waitlist_position_viewed', { rank: statusJson.data.rank });
-        }
-        setStep('verified');
+        const greeting = data.isNewUser ? 'به Carno خوش آمدی 👋' : 'خوش آمدی دوباره 👋';
+        setSuccessGreeting(greeting);
+        setStep('transition');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1200);
       }
     } catch {
       setError('خطا در بررسی کد. لطفاً دوباره تلاش کنید.');
@@ -328,6 +332,21 @@ export function WaitlistSection() {
           </div>
         )}
 
+        {step === 'transition' && (
+          <div className="w-full flex flex-col items-center text-center py-10">
+            <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-3xl mb-4">
+              ✓
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+              {successGreeting}
+            </h2>
+            <p className="text-sm text-slate-400 flex items-center justify-center gap-2 mt-2">
+              <span className="w-2 h-2 rounded-full bg-[#E31C4E] animate-ping" />
+              <span>در حال انتقال به داشبورد کارنو...</span>
+            </p>
+          </div>
+        )}
+
         {step === 'verified' && (
           <div className="w-full flex flex-col items-center text-center">
             
@@ -336,11 +355,19 @@ export function WaitlistSection() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
-              ثبت‌نامت با موفقیت انجام شد.
+              شما وارد حساب کارنو شده‌اید.
             </h2>
-            <p className="text-sm text-slate-400 mb-8">
-              جایگاه تو در صف کاربران اولیه کارنو ثبت شد.
+            <p className="text-sm text-slate-400 mb-6">
+              جایگاه شما در صف کاربران اولیه کارنو ثبت شده است.
             </p>
+
+            <a
+              href="/dashboard"
+              className="w-full max-w-sm h-14 bg-[#E31C4E] hover:bg-[#C21641] text-white font-bold text-base rounded-2xl transition-all duration-200 shadow-lg shadow-[#E31C4E]/25 hover:shadow-[#E31C4E]/40 active:scale-95 flex items-center justify-center gap-2 mb-8 cursor-pointer"
+            >
+              <span>ورود به داشبورد کارنو</span>
+              <span>←</span>
+            </a>
 
             {/* REAL POSITION CARD */}
             <div className="w-full bg-[#0B1124] border border-slate-700/80 rounded-3xl p-6 sm:p-8 flex flex-col items-center shadow-xl mb-8">

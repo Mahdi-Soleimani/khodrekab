@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateSession } from '@/lib/security/session';
 import { checkStatusRateLimit } from '@/lib/security/limiter';
+import { maskPhone } from '@/lib/sms/phone';
 
 export async function GET(req: Request) {
   try {
@@ -117,6 +118,7 @@ export async function GET(req: Request) {
         status: user.status,
         priorityScore: user.waitlistEntry.priorityScore,
         pendingScore: user.waitlistEntry.pendingScore,
+        maskedPhone: maskPhone(user.phone),
       },
     });
 

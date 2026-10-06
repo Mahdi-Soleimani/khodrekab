@@ -120,6 +120,7 @@ export async function POST(req: Request) {
 
     // 7. Account and Waitlist registration under atomic state
     let user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
+    const isNewUser = !user;
 
     if (!user) {
       user = await prisma.user.create({
@@ -254,13 +255,15 @@ export async function POST(req: Request) {
     const response = NextResponse.json({
       success: true,
       message: 'تایید موفقیت‌آمیز',
+      isNewUser,
     });
 
     // 9. Attach secure session cookie
     response.cookies.set(sessionResult.cookieConfig.name, sessionResult.token, sessionResult.cookieConfig);
-
-    // 10. Delete legacy token cookie if present
-    response.cookies.set('token', '', { path: '/', maxAge: 0 });
+    response.cookies.set('token', sessionResult.token, {
+      ...sessionResult.cookieConfig,
+      name: 'token',
+    });
 
     return response;
   } catch (error) {
