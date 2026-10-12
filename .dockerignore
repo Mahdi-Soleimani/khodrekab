@@ -34,6 +34,14 @@ node_modules
 .env.test.local
 .env.production.local
 .local
+secrets/
+.secrets/
+*.secret
+
+# Deployment & Test scripts
+deploy/
+scripts/test-*.ts
+CARNO_*.md
 
 # Build artifacts generated locally
 .next

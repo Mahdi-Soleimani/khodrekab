@@ -6,9 +6,12 @@ services:
       - "3001:3000"
     env_file:
       - .env
-    environment: &app-env
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/carlanding
+    environment:
+      - DATABASE_URL=postgresql://carno_app:${CARNO_APP_DB_PASSWORD}@db:5432/carlanding?schema=public&connection_limit=15&pool_timeout=10&connect_timeout=5
       - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    secrets:
+      - redis_password
     depends_on:
       - db
       - redis
@@ -20,9 +23,13 @@ services:
     restart: "on-failure:5"
     env_file:
       - .env
-    environment: *app-env
+    environment:
+      - DATABASE_URL=postgresql://carno_app:${CARNO_APP_DB_PASSWORD}@db:5432/carlanding?schema=public&connection_limit=15&pool_timeout=10&connect_timeout=5
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    secrets:
+      - redis_password
     depends_on:
-      - db
       - redis
 
   db:
@@ -38,8 +45,23 @@ services:
 
   redis:
     image: redis:7-alpine
+    command: >
+      sh -c '
+        if [ ! -s /run/secrets/redis_password ]; then
+          echo "FATAL: /run/secrets/redis_password is empty or missing" >&2;
+          exit 1;
+        fi;
+        find /data \! -user redis -exec chown redis:redis {} +;
+        exec /usr/bin/setpriv --reuid redis --regid redis --clear-groups sh -c "
+          printf \"appendonly yes\nappendfsync everysec\nmaxmemory 256mb\nmaxmemory-policy noeviction\nrequirepass %s\n\" \"\$(cat /run/secrets/redis_password)\" | exec redis-server -
+        "
+      '
+    secrets:
+      - redis_password
+    volumes:
+      - redis_data:/data
     ports:
-      - "6380:6379"
+      - "127.0.0.1:6380:6379"
 
   n8n:
     image: n8nio/n8n:latest
@@ -53,6 +75,11 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
 
+secrets:
+  redis_password:
+    file: ./secrets/redis_password.txt
+
 volumes:
   pgdata:
   n8n_data:
+  redis_data:

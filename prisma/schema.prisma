@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 enum UserStatus {
@@ -56,6 +57,8 @@ model WaitlistEntry {
   priorityScore  Int      @default(10)
   pendingScore   Int      @default(0)
   joinedAt       DateTime @default(now())
+
+  @@index([priorityScore(sort: Desc), joinedAt(sort: Asc)])
 }
 
 model OTPVerification {
@@ -89,13 +92,14 @@ model PaymentIntent {
   status          PaymentStatus @default(PENDING)
   cardNumber      String?       // masked card used for payment
   expiresAt       DateTime      // 15 min timeout
+  expiredAt       DateTime?
   confirmedAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
   logs            PaymentLog[]
 
-  @@unique([uniqueCode, status]) // ensure unique codes among PENDING
+  @@index([userId])
   @@index([status, totalAmount])
 }
 
@@ -106,6 +110,8 @@ model PaymentLog {
   action     String   // CREATED, PAGE_OPENED, CONFIRMED, EXPIRED, REFUNDED
   metadata   Json?
   createdAt  DateTime @default(now())
+
+  @@index([paymentId, createdAt(sort: Desc)])
 }
 
 model Referral {
@@ -122,8 +128,8 @@ model Referral {
   maturesAt     DateTime?
   createdAt     DateTime       @default(now())
 
-  @@index([inviterId, isMatured, maturesAt])
-  @@index([inviterId, createdAt])
+  @@index([inviterId, isMatured, maturesAt], map: "Referral_inviter_matured_idx")
+  @@index([inviterId, createdAt], map: "Referral_inviter_created_idx")
 }
 
 model Session {
@@ -138,7 +144,7 @@ model Session {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
   @@index([expiresAt])
 }
 

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "worker:sms": "npx tsx scripts/sms-worker.ts"
+    "worker:sms": "tsx scripts/sms-worker.ts",
+    "maintenance:otp": "tsx scripts/maintenance-runner.ts",
+    "ops:check": "tsx scripts/operational-check.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -18,15 +20,18 @@
     "jsonwebtoken": "^9.0.3",
     "nanoid": "^6.0.1",
     "next": "16.3.6",
+    "pg": "^8.23.1",
     "posthog-js": "^1.434.15",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "tsx": "^4.23.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

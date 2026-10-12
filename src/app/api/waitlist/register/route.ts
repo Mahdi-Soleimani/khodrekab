@@ -74,10 +74,10 @@ export async function POST(req: Request) {
     const otp = crypto.randomInt(10000, 100000).toString();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // 6. Invalidate prior unverified challenges
+    // 6. Invalidate prior unverified challenges (expire them immediately, strictly keep verified = false)
     await prisma.oTPVerification.updateMany({
       where: { phone: normalizedPhone, verified: false },
-      data: { verified: true },
+      data: { expiresAt: new Date(0) },
     });
 
     // 7. Persist challenge with HMAC-SHA256 (D5 / B.2)
@@ -106,10 +106,13 @@ export async function POST(req: Request) {
         challengeId: challenge.id,
       });
     } catch (queueErr) {
-      // Invalidate the challenge if queue dispatch failed
+      // Invalidate the challenge if queue dispatch failed: immediately expire it while verified = false
       await prisma.oTPVerification.update({
         where: { id: challenge.id },
-        data: { verified: true },
+        data: {
+          expiresAt: new Date(),
+          verified: false,
+        },
       });
 
       console.error(`[OTP_QUEUE_FAILED] Could not enqueue OTP for ${masked}:`, queueErr);

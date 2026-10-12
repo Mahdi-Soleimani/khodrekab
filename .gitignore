@@ -45,6 +45,9 @@ Desktop.ini
 .env.test.local
 .env.production.local
 .local
+secrets/
+.secrets/
+*.secret
 
 # Cache & Temp
 .cache
@@ -83,6 +86,8 @@ tsconfig.tsbuildinfo
 *.sqlite-journal
 *.db
 *.sql
+!prisma/migrations/**/*.sql
+!prisma/bootstrap-roles.sql
 backup-*.sql
 backup-before-c1.sql
 

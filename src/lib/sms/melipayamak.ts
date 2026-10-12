@@ -1,11 +1,20 @@
 import { SmsProvider, SendOtpInput, SendOtpResult, MeliPayamakConfig, MeliPayamakResponse } from './types';
 import { maskPhone } from './phone';
 
+export interface ExtendedMeliPayamakConfig extends MeliPayamakConfig {
+  endpoint?: string;
+  timeoutMs?: number;
+}
+
 export class MeliPayamakProvider implements SmsProvider {
   public readonly name = 'MeliPayamak';
-  private readonly endpoint = 'https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber';
+  private readonly endpoint: string;
+  private readonly timeoutMs: number;
 
-  constructor(private readonly config: MeliPayamakConfig) {}
+  constructor(private readonly config: ExtendedMeliPayamakConfig) {
+    this.endpoint = config.endpoint || 'https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber';
+    this.timeoutMs = config.timeoutMs ?? 10000;
+  }
 
   public async sendOtp(input: SendOtpInput): Promise<SendOtpResult> {
     const masked = maskPhone(input.phone);
@@ -26,20 +35,22 @@ export class MeliPayamakProvider implements SmsProvider {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: params.toString(),
+        signal: AbortSignal.timeout(this.timeoutMs),
       });
 
       if (!response.ok) {
-        console.error(`[MeliPayamak] Gateway HTTP error: ${response.status} for ${masked}`);
+        const status = response.status;
+        console.error(`[MeliPayamak] Gateway HTTP error: ${status} for ${masked}`);
         return {
           success: false,
-          error: `HTTP_${response.status}`,
+          error: `HTTP_${status}`,
           userMessage: 'ارسال کد با مشکل مواجه شد. لطفاً چند لحظه بعد دوباره امتحان کنید.',
         };
       }
 
       const data: MeliPayamakResponse = await response.json();
 
-      // Check success: RetStatus === 1 or Value is a numeric tracking ID
+      // Check success: RetStatus === 1 or Value is a numeric tracking ID (> 5 chars, non-negative)
       const isSuccess =
         data.RetStatus === 1 ||
         (typeof data.Value === 'string' && data.Value.length > 5 && !data.Value.startsWith('-'));
@@ -53,7 +64,7 @@ export class MeliPayamakProvider implements SmsProvider {
         };
       }
 
-      // Handle provider error codes without leaking internal details
+      // Handle provider error codes without leaking internal details or OTP
       const errorCode = String(data.Value ?? data.RetStatus ?? 'UNKNOWN');
       console.error(`[MeliPayamak] Gateway rejected request for ${masked}. Code: ${errorCode}`);
 
@@ -62,8 +73,19 @@ export class MeliPayamakProvider implements SmsProvider {
         error: `PROVIDER_ERROR_${errorCode}`,
         userMessage: 'ارسال کد با مشکل مواجه شد. لطفاً چند لحظه بعد دوباره امتحان کنید.',
       };
-    } catch (err: any) {
-      console.error(`[MeliPayamak] Network or parsing exception for ${masked}:`, err.message || err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+          console.error(`[MeliPayamak] Gateway timeout (${this.timeoutMs}ms) for ${masked}`);
+          return {
+            success: false,
+            error: 'TIMEOUT_EXCEPTION',
+            userMessage: 'پاسخی از سرور پیامک دریافت نشد. لطفاً بعداً تلاش کنید.',
+          };
+        }
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[MeliPayamak] Network exception for ${masked}:`, msg);
       return {
         success: false,
         error: 'NETWORK_EXCEPTION',

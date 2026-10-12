@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcryptjs';
 import { normalizeIranianPhone, convertDigitsToEnglish, maskPhone } from '@/lib/sms/phone';
@@ -110,25 +111,48 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'کد تایید وارد شده اشتباه است.' }, { status: 400 });
     }
 
-    // 6. Handle Valid Code: clear failure counters & mark challenge verified
+    // 6. Handle Valid Code: clear failure counters & mark challenge verified ATOMICALLY
     await clearOtpFailure(normalizedPhone);
 
-    await prisma.oTPVerification.update({
-      where: { id: otpRecord.id },
-      data: { verified: true, attempts: { increment: 1 } },
+    const updateResult = await prisma.oTPVerification.updateMany({
+      where: {
+        id: otpRecord.id,
+        verified: false,
+      },
+      data: {
+        verified: true,
+        attempts: { increment: 1 },
+      },
     });
 
-    // 7. Account and Waitlist registration under atomic state
+    if (updateResult.count === 0) {
+      // Replay / parallel race detected: another concurrent request already marked this challenge verified
+      return NextResponse.json(
+        { error: 'این کد قبلاً استفاده شده است یا منقضی گردیده است.' },
+        { status: 409 }
+      );
+    }
+
+    // 7. Account and Waitlist registration under concurrency-safe state
     let user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
     const isNewUser = !user;
 
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          phone: normalizedPhone,
-          phoneVerified: true,
-        },
-      });
+      try {
+        user = await prisma.user.create({
+          data: {
+            phone: normalizedPhone,
+            phoneVerified: true,
+          },
+        });
+      } catch (userErr: unknown) {
+        if (userErr instanceof Prisma.PrismaClientKnownRequestError && userErr.code === 'P2002') {
+          // Concurrently created by a parallel request
+          user = await prisma.user.findUniqueOrThrow({ where: { phone: normalizedPhone } });
+        } else {
+          throw userErr;
+        }
+      }
     } else if (!user.phoneVerified) {
       await prisma.user.update({
         where: { id: user.id },
@@ -172,6 +196,14 @@ export async function POST(req: Request) {
           // 2. Atomic Velocity Cap and Point Isolation (count CONVERTED in 24h + create in 1 transaction)
           try {
             await prisma.$transaction(async (tx) => {
+              // Ensure user has not already been referred in a race condition
+              const existingRef = await tx.referral.findUnique({
+                where: { invitedUserId: user.id },
+              });
+              if (existingRef) {
+                return;
+              }
+
               const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
               const recentConvertedCount = await tx.referral.count({
                 where: {
@@ -230,21 +262,46 @@ export async function POST(req: Request) {
                 });
               }
             });
-          } catch (refErr: any) {
+          } catch (refErr: unknown) {
             // P2002: unique constraint failed on invitedUserId (duplicate referral)
-            console.warn(`[REFERRAL_SKIP] Duplicate or concurrent referral attempt for user ${user.id}:`, refErr.message);
+            const msg = refErr instanceof Error ? refErr.message : String(refErr);
+            console.warn(`[REFERRAL_SKIP] Duplicate or concurrent referral attempt for user ${user.id}:`, msg);
           }
         }
       }
 
-      waitlistEntry = await prisma.waitlistEntry.create({
-        data: {
-          userId: user.id,
-          referralCode: nanoid(8),
-          referredBy: inviterId,
-          source: source || 'direct',
-        },
-      });
+      // Concurrency-safe WaitlistEntry creation handling P2002 on userId or referralCode
+      let created = false;
+      let attempts = 0;
+      while (!created && attempts < 5) {
+        attempts++;
+        const refCode = nanoid(8);
+        try {
+          waitlistEntry = await prisma.waitlistEntry.create({
+            data: {
+              userId: user.id,
+              referralCode: refCode,
+              referredBy: inviterId,
+              source: source || 'direct',
+            },
+          });
+          created = true;
+        } catch (wlErr: unknown) {
+          if (wlErr instanceof Prisma.PrismaClientKnownRequestError && wlErr.code === 'P2002') {
+            const existingEntry = await prisma.waitlistEntry.findUnique({
+              where: { userId: user.id },
+            });
+            if (existingEntry) {
+              waitlistEntry = existingEntry;
+              created = true;
+              break;
+            }
+            // Unique collision on referralCode: retry loop generates fresh nanoid
+          } else {
+            throw wlErr;
+          }
+        }
+      }
     }
 
     // 8. Create stateful session (2-hour lifetime, HS256)
