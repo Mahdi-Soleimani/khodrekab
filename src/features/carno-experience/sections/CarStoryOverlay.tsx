@@ -69,7 +69,7 @@ export function CarStoryOverlay() {
         </div>
 
         {/* Phase 2: Side / Opportunity */}
-        <div ref={phase2Ref} className="absolute top-0 right-0 left-0 text-white">
+        <div ref={phase2Ref} className="absolute top-0 right-0 left-0 text-white opacity-0">
           <div className="w-8 h-[2px] bg-[#E31C3D] mb-4" />
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.2] mb-4 text-white">
             فرصت‌های <span className="text-[#E31C3D]">زیر قیمت بازار</span> را قبل از بقیه پیدا کن.
@@ -80,7 +80,7 @@ export function CarStoryOverlay() {
         </div>
 
         {/* Phase 3: Rear / Hidden Signals */}
-        <div ref={phase3Ref} className="absolute top-0 right-0 left-0 text-white">
+        <div ref={phase3Ref} className="absolute top-0 right-0 left-0 text-white opacity-0">
           <div className="w-8 h-[2px] bg-[#E31C3D] mb-4" />
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.2] mb-4 text-white">
             قبل از تماس، <span className="text-[#E31C3D]">چیزی را ببین</span> که در آگهی دیده نمی‌شود.
@@ -91,7 +91,7 @@ export function CarStoryOverlay() {
         </div>
 
         {/* Phase 4: Return / Decision */}
-        <div ref={phase4Ref} className="absolute top-0 right-0 left-0 text-white">
+        <div ref={phase4Ref} className="absolute top-0 right-0 left-0 text-white opacity-0">
           <div className="w-8 h-[2px] bg-[#E31C3D] mb-4" />
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.2] mb-4 text-white">
             ماشین بعدی‌ات را <span className="text-[#E31C3D]">با عدد انتخاب کن</span>، نه با حدس.

@@ -1,15 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { AssetResolver } from '../engine/loader/AssetResolver';
-import { FrameLoader } from '../engine/loader/FrameLoader';
-import { LoadQueue } from '../engine/loader/LoadQueue';
-import { BitmapCache } from '../engine/cache/BitmapCache';
-import { CanvasRenderer } from '../engine/renderer/CanvasRenderer';
-import { FrameController } from '../engine/renderer/FrameController';
-import { CarnoManifest, LoadPriority } from '../engine/loader/types';
-import { ProtectionTier } from '../engine/cache/types';
+import { ExperienceSession, HandoffState, SessionSnapshot, liveSessionCount } from '../delivery/ExperienceSession';
+import { MOBILE_MEDIA_QUERY } from '../delivery/assetProfile';
 
 export const CarnoAnalytics = {
-  track: (eventName: string, payload?: Record<string, any>) => {
+  track: (eventName: string, payload?: Record<string, unknown>) => {
     // Structured local logger - zero external network requests
     if (process.env.NODE_ENV === 'development') {
       console.debug(`[Carno Analytics] ${eventName}`, payload);
@@ -20,138 +14,90 @@ export const CarnoAnalytics = {
 interface UseCarnoExperienceOptions {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   manifestPath?: string;
+  /** Called exactly once per session when the poster may be hidden ('done') or must stay ('blocked'). */
+  onHandoff?: (state: HandoffState, detail: Record<string, unknown>) => void;
+  /** Lightweight state for local diagnostics / tests (no network, no user data). */
+  onSnapshot?: (snapshot: SessionSnapshot & { liveSessions: number }) => void;
 }
 
-export function useCarnoExperience({ canvasRef, manifestPath = '/car-frames/v1/manifest.json' }: UseCarnoExperienceOptions) {
-  const engineRef = useRef<{
-    cache: BitmapCache;
-    renderer: CanvasRenderer;
-    controller: FrameController;
-    queue: LoadQueue;
-    manifestVersion: string;
-    frameCount: number;
-    loadedFrames: Set<number>;
-    keyframes: number[];
-  } | null>(null);
-
-  const initEngine = useCallback(async () => {
-    if (!canvasRef.current || engineRef.current) return;
-
-    try {
-      CarnoAnalytics.track('car_asset_load_started', { profile: 'auto' });
-      
-      const response = await fetch(manifestPath);
-      const manifest: CarnoManifest = await response.json();
-
-      const resolver = new AssetResolver(manifest);
-      const cache = new BitmapCache(manifest.frameCount);
-      const loader = new FrameLoader();
-      const queue = new LoadQueue({ loader, resolver, manifest, maxConcurrent: 4 });
-      
-      const controller = new FrameController(manifest.frameCount);
-      const renderer = new CanvasRenderer(controller, cache);
-
-      renderer.attachCanvas(canvasRef.current);
-      
-      const loadedFrames = new Set<number>();
-      
-      // Setup progressive loading using the architecture rules:
-      // Priority 1: Hero (frame 1)
-      queue.loadFrame({ frameNumber: manifest.defaultFrame, priority: LoadPriority.HERO, profileId: 'desktop' })
-        .then(result => {
-          cache.insert(result.frameNumber, result.bitmap as ImageBitmap, ProtectionTier.CRITICAL);
-          loadedFrames.add(result.frameNumber);
-          CarnoAnalytics.track('car_asset_first_frame_ready', { timeToFirstFrameMs: performance.now() });
-        });
-
-      // Priority 2: Keyframes
-      manifest.keyframes.forEach(frame => {
-        queue.loadFrame({ frameNumber: frame, priority: LoadPriority.KEYFRAMES, profileId: 'desktop' })
-          .then(result => {
-            cache.insert(result.frameNumber, result.bitmap as ImageBitmap, ProtectionTier.HIGH);
-            loadedFrames.add(result.frameNumber);
-          });
-      });
-
-      // Priority 3: Secondary Keyframes
-      const secondaryKeyframes = [15, 45, 75, 105];
-      secondaryKeyframes.forEach(frame => {
-        if (frame <= manifest.frameCount && !manifest.keyframes.includes(frame)) {
-          queue.loadFrame({ frameNumber: frame, priority: LoadPriority.SECONDARY_KEYFRAMES, profileId: 'desktop' })
-            .then(result => {
-              cache.insert(result.frameNumber, result.bitmap as ImageBitmap, ProtectionTier.NORMAL);
-              loadedFrames.add(result.frameNumber);
-            });
-        }
-      });
-
-      // Priority 4: All other frames (Background loading for smooth 3D rotation)
-      for (let i = 1; i <= manifest.frameCount; i++) {
-        if (i !== manifest.defaultFrame && !manifest.keyframes.includes(i) && !secondaryKeyframes.includes(i)) {
-          queue.loadFrame({ frameNumber: i, priority: LoadPriority.BACKGROUND, profileId: 'desktop' })
-            .then(result => {
-              cache.insert(result.frameNumber, result.bitmap as ImageBitmap, ProtectionTier.NORMAL);
-              loadedFrames.add(result.frameNumber);
-            });
-        }
-      }
-
-      renderer.start();
-
-      engineRef.current = {
-        cache,
-        renderer,
-        controller,
-        queue,
-        manifestVersion: manifest.version,
-        frameCount: manifest.frameCount,
-        loadedFrames,
-        keyframes: manifest.keyframes
-      };
-
-    } catch (err) {
-      console.error('Carno Engine Initialization failed:', err);
-    }
-  }, [canvasRef, manifestPath]);
+/**
+ * Owns one ExperienceSession per effect run. In React Strict Mode the effect runs
+ * mount -> cleanup -> mount; the first session is disposed before the second starts work,
+ * so exactly one live renderer remains.
+ */
+export function useCarnoExperience({
+  canvasRef,
+  manifestPath = '/car-frames/v1/manifest.json',
+  onHandoff,
+  onSnapshot,
+}: UseCarnoExperienceOptions) {
+  const sessionRef = useRef<ExperienceSession | null>(null);
+  const handoffRef = useRef(onHandoff);
+  const snapshotRef = useRef(onSnapshot);
 
   useEffect(() => {
-    initEngine();
+    handoffRef.current = onHandoff;
+    snapshotRef.current = onSnapshot;
+  }, [onHandoff, onSnapshot]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const session = new ExperienceSession({
+      canvas,
+      manifestPath,
+      // Profile is chosen once per session (no switching on resize).
+      isMobileViewport: window.matchMedia(MOBILE_MEDIA_QUERY).matches,
+      onHandoff: (state, detail) => {
+        if (sessionRef.current !== session) return;
+        CarnoAnalytics.track(state === 'done' ? 'car_asset_first_frame_ready' : 'car_asset_handoff_blocked', detail);
+        handoffRef.current?.(state, detail);
+      },
+      onSnapshot: (s) => {
+        if (sessionRef.current !== session) return;
+        snapshotRef.current?.({ ...s, liveSessions: liveSessionCount() });
+      },
+    });
+    sessionRef.current = session;
+    CarnoAnalytics.track('car_asset_load_started', { profile: 'auto' });
+    session.start().catch((err) => {
+      console.error('Carno Engine Initialization failed:', err);
+    });
 
     return () => {
-      if (engineRef.current) {
-        engineRef.current.renderer.stop();
-        engineRef.current.cache.clear();
-        engineRef.current = null;
-      }
+      if (sessionRef.current === session) sessionRef.current = null;
+      session.dispose();
     };
-  }, [initEngine]);
+  }, [canvasRef, manifestPath]);
+
+  const setProgress = useCallback((progress: number) => {
+    sessionRef.current?.setProgress(progress);
+  }, []);
 
   const getDebugStats = useCallback(() => {
-    if (!engineRef.current) return null;
-    const { cache, controller, manifestVersion, frameCount, loadedFrames, keyframes } = engineRef.current;
-    
+    const session = sessionRef.current;
+    const controller = session?.getController();
+    if (!session || !controller) return null;
+    const s = session.snapshot();
     const frame = controller.getCurrentFrame();
-    const progress = frame / frameCount;
-    const cacheStats = cache.getStatistics();
-    
-    const loadedKeyframes = keyframes.filter(kf => loadedFrames.has(kf)).length;
-    
     return {
       frame,
-      progress: progress.toFixed(2),
-      cacheSize: cacheStats.currentSize,
-      cacheCapacity: cacheStats.maxCapacity,
-      memoryProfile: cacheStats.memoryProfile,
-      loadedFrames: loadedFrames.size,
-      keyframesLoaded: loadedKeyframes,
-      totalKeyframes: keyframes.length,
+      progress: (frame / 120).toFixed(2),
+      cacheSize: s.resident,
+      cacheCapacity: s.capacity,
+      memoryProfile: s.profileId ?? 'unknown',
+      loadedFrames: s.validated,
+      keyframesLoaded: 0,
+      totalKeyframes: 0,
       fps: 60, // approximate constant target
-      manifestVersion
+      manifestVersion: s.identity ?? 'unknown',
     };
   }, []);
 
   return {
-    getController: useCallback(() => engineRef.current?.controller, []),
-    getDebugStats
+    getController: useCallback(() => sessionRef.current?.getController() ?? undefined, []),
+    setProgress,
+    getDebugStats,
   };
 }
