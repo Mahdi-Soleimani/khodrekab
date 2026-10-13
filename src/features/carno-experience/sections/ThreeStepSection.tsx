@@ -9,8 +9,8 @@ export function ThreeStepSection() {
     },
     {
       number: '۲',
-      title: 'Carno بازار را بررسی می‌کند',
-      desc: 'کارنو به‌صورت پیوسته آگهی‌ها و نوسانات قیمت بازار را تحلیل کرده و پیشنهادها را با معیارهای واقعی مقایسه می‌کند.',
+      title: 'خودرکاب بازار را بررسی می‌کند',
+      desc: 'خودرکاب به‌صورت پیوسته آگهی‌ها و نوسانات قیمت بازار را تحلیل کرده و پیشنهادها را با معیارهای واقعی مقایسه می‌کند.',
     },
     {
       number: '۳',
@@ -35,7 +35,7 @@ export function ThreeStepSection() {
           id="three-step-heading"
           className="text-2xl sm:text-4xl font-black text-center text-white tracking-tight mb-4"
         >
-          کارنو چگونه مسیر خرید خودرو را آسان می‌کند؟
+          خودرکاب چگونه مسیر خرید خودرو را آسان می‌کند؟
         </h2>
         <p className="text-sm sm:text-base text-slate-400 text-center mb-16 max-w-xl leading-relaxed">
           سه گام ساده تا رسیدن به انتخابی مطمئن و آگاهانه در بازار خودرو.

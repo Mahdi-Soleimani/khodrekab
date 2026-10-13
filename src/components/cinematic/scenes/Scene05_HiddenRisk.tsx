@@ -82,7 +82,7 @@ export function Scene05_HiddenRisk({ progress, active }: SceneProps) {
             اما شاید مشکلاتی را پنهان کند.
           </h3>
           <p className="text-base text-[#666666] leading-relaxed mt-2">
-            کارنو ریسک‌های پنهان بدنه و فنی را پیش از خرید برای شما آشکار می‌کند.
+            خودرکاب ریسک‌های پنهان بدنه و فنی را پیش از خرید برای شما آشکار می‌کند.
           </p>
           {/* Risk indicator — thin, elegant */}
           <div className="mt-5 flex items-center gap-3">

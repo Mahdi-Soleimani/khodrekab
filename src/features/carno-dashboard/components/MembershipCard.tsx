@@ -24,7 +24,7 @@ export function MembershipCard({ rank, status, priorityScore }: MembershipCardPr
               <BadgeIcon size={24} />
             </div>
             <h2 className="text-2xl md:text-3xl text-white font-extrabold tracking-tight">
-              عضویت Carno
+              عضویت خودرکاب
             </h2>
           </div>
           
@@ -59,7 +59,7 @@ export function MembershipCard({ rank, status, priorityScore }: MembershipCardPr
       {/* Secondary Status Footer */}
       <div className="mt-6 pt-4 border-t border-slate-800/80 text-right">
         <p className="text-base md:text-lg text-slate-300 font-medium leading-relaxed">
-          در حال تشکیل اولین گروه کاربران Carno
+          در حال تشکیل اولین گروه کاربران خودرکاب
         </p>
       </div>
 

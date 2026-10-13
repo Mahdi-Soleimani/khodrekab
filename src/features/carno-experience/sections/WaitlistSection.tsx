@@ -253,7 +253,7 @@ export function WaitlistSection() {
         setError(data.error || 'کد وارد شده اشتباه یا منقضی شده است.');
       } else {
         CarnoAnalytics.track('otp_verified');
-        const greeting = data.isNewUser ? 'به Carno خوش آمدی 👋' : 'خوش آمدی دوباره 👋';
+        const greeting = data.isNewUser ? 'به خودرکاب خوش آمدی 👋' : 'خوش آمدی دوباره 👋';
         setSuccessGreeting(greeting);
         setStep('transition');
         setTimeout(() => {
@@ -434,7 +434,7 @@ export function WaitlistSection() {
             </h2>
             <p className="text-sm text-slate-400 flex items-center justify-center gap-2 mt-2">
               <span className="w-2 h-2 rounded-full bg-[#E31C4E] animate-ping" />
-              <span>در حال انتقال به داشبورد کارنو...</span>
+              <span>در حال انتقال به داشبورد خودرکاب...</span>
             </p>
           </div>
         )}
@@ -447,17 +447,17 @@ export function WaitlistSection() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
-              شما وارد حساب کارنو شده‌اید.
+              شما وارد حساب خودرکاب شده‌اید.
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              جایگاه شما در صف کاربران اولیه کارنو ثبت شده است.
+              جایگاه شما در صف کاربران اولیه خودرکاب ثبت شده است.
             </p>
 
             <a
               href="/dashboard"
               className="w-full max-w-sm h-14 bg-[#E31C4E] hover:bg-[#C21641] text-white font-bold text-base rounded-2xl transition-all duration-200 shadow-lg shadow-[#E31C4E]/25 hover:shadow-[#E31C4E]/40 active:scale-95 flex items-center justify-center gap-2 mb-8 cursor-pointer"
             >
-              <span>ورود به داشبورد کارنو</span>
+              <span>ورود به داشبورد خودرکاب</span>
               <span>←</span>
             </a>
 
@@ -472,7 +472,7 @@ export function WaitlistSection() {
               </div>
 
               <div className="mt-4 px-4 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300">
-                در حال تشکیل اولین گروه کاربران Carno
+                در حال تشکیل اولین گروه کاربران خودرکاب
               </div>
 
               <p className="text-xs text-slate-400 mt-4 leading-relaxed max-w-sm">

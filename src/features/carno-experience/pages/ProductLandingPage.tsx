@@ -20,8 +20,8 @@ export function ProductLandingPage() {
       itemScope 
       itemType="https://schema.org/Product"
     >
-      <meta itemProp="name" content="کارنو | سامانه تحلیل و ارزیابی هوشمند خودرو" />
-      <meta itemProp="description" content="کارنو؛ تحلیل هوشمند بازار خودرو و کشف فرصت‌های زیر قیمت بازار. با عدد، نه با حدس." />
+      <meta itemProp="name" content="خودرکاب | سامانه تحلیل و ارزیابی هوشمند خودرو" />
+      <meta itemProp="description" content="خودرکاب؛ تحلیل هوشمند بازار خودرو و کشف فرصت‌های زیر قیمت بازار. با عدد، نه با حدس." />
       
       {/* 1. Cinematic Navigation */}
       <header>
@@ -34,10 +34,10 @@ export function ProductLandingPage() {
       {/* 3. Problem Section (بزرگترین اشتباه هنگام خرید خودرو چیست؟) */}
       <ProblemSection />
 
-      {/* 4. Sample Analysis Section (نمونه تحلیل Carno با برچسب نمونه نمایشی) */}
+      {/* 4. Sample Analysis Section (نمونه تحلیل خودرکاب با برچسب نمونه نمایشی) */}
       <SampleAnalysisSection />
 
-      {/* 5. Three-Step Explanation (نحوه کارکرد کارنو در سه گام ساده) */}
+      {/* 5. Three-Step Explanation (نحوه کارکرد خودرکاب در سه گام ساده) */}
       <ThreeStepSection />
 
       {/* 6. Trust Layer (هویت تیم جی‌هاب، مرحله محصول، حریم خصوصی شماره همراه) */}

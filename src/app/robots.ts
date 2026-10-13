@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://carno.ir/sitemap.xml',
+    sitemap: 'https://khodrekab.ir/sitemap.xml',
   }
 }

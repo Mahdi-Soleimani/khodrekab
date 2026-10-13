@@ -11,7 +11,7 @@ export function LaunchStatusCard() {
         <div className="flex items-center gap-3">
           <span className="w-3 h-3 rounded-full bg-emerald-400" />
           <h3 className="text-xl md:text-2xl text-white font-bold tracking-tight">
-            Carno در حال آماده‌سازی است
+            خودرکاب در حال آماده‌سازی است
           </h3>
         </div>
         <p className="text-base md:text-lg text-slate-200 font-medium leading-relaxed">

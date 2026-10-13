@@ -53,6 +53,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+!.env.runflare.example
 secrets/
 .secrets/
 *.secret
@@ -75,7 +76,6 @@ generate-frames.js
 generate-mocks.js
 generate_frames.py
 optimize_frames.js
-n8n-payment-workflow.json
 
 # Project markdown documentation (not needed in production image)
 README.md

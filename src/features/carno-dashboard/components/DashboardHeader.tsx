@@ -44,7 +44,7 @@ export function DashboardHeader({ maskedPhone, avatarUrl }: DashboardHeaderProps
             <div className="h-10 w-10 relative overflow-hidden rounded-xl bg-[#E31C4E] flex items-center justify-center shadow-md shadow-rose-950/40">
               <Image 
                 src="/images/carno-logo.png" 
-                alt="Carno Logo" 
+                alt="Khodrekab Logo" 
                 width={36} 
                 height={36} 
                 className="h-9 w-auto object-contain"
@@ -52,10 +52,10 @@ export function DashboardHeader({ maskedPhone, avatarUrl }: DashboardHeaderProps
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-              <span className="font-extrabold text-white text-lg">C</span>
+              <span className="font-extrabold text-white text-lg">K</span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="font-extrabold text-xl text-white tracking-tight leading-tight">کارنو</span>
+              <span className="font-extrabold text-xl text-white tracking-tight leading-tight">خودرکاب</span>
               <span className="text-xs text-rose-300 font-semibold tracking-wider">با عدد، نه با حدس</span>
             </div>
           </div>
@@ -145,10 +145,10 @@ export function DashboardHeader({ maskedPhone, avatarUrl }: DashboardHeaderProps
         <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-lg bg-[#E31C4E] flex items-center justify-center text-white font-extrabold text-base">
-              C
+              K
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-base text-white tracking-tight">کارنو</span>
+              <span className="font-bold text-base text-white tracking-tight">خودرکاب</span>
               <span className="text-[11px] text-rose-300 font-medium">با عدد، نه با حدس</span>
             </div>
           </div>

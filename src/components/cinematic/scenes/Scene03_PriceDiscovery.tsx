@@ -52,7 +52,7 @@ export function Scene03_PriceDiscovery({ progress, active }: SceneProps) {
               className="flex flex-col items-center w-full"
               style={{ opacity: line2Progress, transform: `translateY(${10 * (1 - line2Progress)}px)`, transition: 'all 0.4s ease-out' }}
             >
-              <span className="text-[10px] md:text-xs text-[#666666] mb-1">ارزش واقعی کارنو</span>
+              <span className="text-[10px] md:text-xs text-[#666666] mb-1">ارزش واقعی خودرکاب</span>
               <span className="text-2xl md:text-3xl font-black text-[#16a34a] tabular-nums tracking-tight">۷۸۰ <span className="text-[10px] md:text-xs font-normal text-[#16a34a]/60">میلیون</span></span>
             </div>
             

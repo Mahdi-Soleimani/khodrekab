@@ -121,7 +121,7 @@ export default function PaymentPage() {
                 <span className="font-bold text-lg dir-ltr font-mono">{cardNumber}</span>
               </div>
               <div className="flex justify-between items-center mb-4 text-xs text-[var(--color-text-tertiary)]">
-                <span>به نام: کارنو (جی‌هاب)</span>
+                <span>به نام: خودرکاب (جی‌هاب)</span>
               </div>
               
               <Button 

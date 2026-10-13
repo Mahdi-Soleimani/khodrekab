@@ -15,7 +15,7 @@ export function ReferralCard({ refCode, priorityScore }: ReferralCardProps) {
     if (typeof window !== 'undefined') {
       return `${window.location.origin}/?ref=${refCode}`;
     }
-    return `https://carno.ir/?ref=${refCode}`;
+    return `https://khodrekab.ir/?ref=${refCode}`;
   };
 
   const referralLink = getFullReferralLink();

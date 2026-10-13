@@ -43,10 +43,10 @@ export function CinematicNav() {
           className="flex items-center gap-3 cursor-pointer group"
         >
           <div className="w-8 h-8 bg-[#E31C4E] rounded-lg flex items-center justify-center font-black text-white text-base shadow-md shadow-[#E31C4E]/30 group-hover:scale-105 transition-transform">
-            C
+            K
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-black text-white tracking-tight">کارنو</span>
+            <span className="text-xl font-black text-white tracking-tight">خودرکاب</span>
             <span className="text-[10px] text-slate-400 font-medium -mt-1 hidden sm:inline">با عدد، نه با حدس</span>
           </div>
         </div>

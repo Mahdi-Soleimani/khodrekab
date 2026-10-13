@@ -21,7 +21,7 @@ export function GreetingSection({ maskedPhone, isEarlyAccess = false, avatarUrl 
       <div className="flex flex-col gap-3 z-10 max-w-3xl text-right">
         <div className="flex items-center gap-3.5 flex-wrap">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            خوش آمدی به Carno 👋
+            خوش آمدی به خودرکاب 👋
           </h1>
           <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold border ${
             isEarlyAccess 

@@ -17,10 +17,10 @@ export function SampleAnalysisSection() {
           id="sample-analysis-heading"
           className="text-2xl sm:text-4xl font-black text-center text-white tracking-tight mb-4"
         >
-          نمونه تحلیل Carno
+          نمونه تحلیل خودرکاب
         </h2>
         <p className="text-sm sm:text-base text-slate-400 text-center mb-12 max-w-xl leading-relaxed">
-          کارنو آگهی‌های خودرو را به اعداد و نشانه‌های قابل اتکا تبدیل می‌کند تا قبل از هدر دادن وقت، کیفیت فرصت را بسنجید.
+          خودرکاب آگهی‌های خودرو را به اعداد و نشانه‌های قابل اتکا تبدیل می‌کند تا قبل از هدر دادن وقت، کیفیت فرصت را بسنجید.
         </p>
 
         {/* Structural Analysis Card */}
@@ -30,7 +30,7 @@ export function SampleAnalysisSection() {
           <div className="absolute top-0 right-0 left-0 bg-slate-800/90 border-b border-slate-700 px-4 py-2 flex items-center justify-between text-xs text-slate-300 font-medium z-10">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true" />
-              <span>نمونه نمایشی از خروجی Carno</span>
+              <span>نمونه نمایشی از خروجی خودرکاب</span>
             </span>
             <span className="text-[11px] text-slate-400 font-mono">ID: CARNO-SAMPLE-PREVIEW</span>
           </div>
@@ -120,7 +120,7 @@ export function SampleAnalysisSection() {
 
         {/* Honest Transparency Footnote */}
         <p className="text-xs text-slate-400 text-center mt-6 max-w-xl">
-          * مقادیر بالا ساختار خروجی تحلیلی کارنو را نمایش می‌دهند. نسخه نهایی محاسبات را مستقیماً بر اساس داده‌های لحظه‌ای بازار خودرو انجام می‌دهد.
+          * مقادیر بالا ساختار خروجی تحلیلی خودرکاب را نمایش می‌دهند. نسخه نهایی محاسبات را مستقیماً بر اساس داده‌های لحظه‌ای بازار خودرو انجام می‌دهد.
         </p>
       </div>
     </section>

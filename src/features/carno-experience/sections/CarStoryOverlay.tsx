@@ -64,7 +64,7 @@ export function CarStoryOverlay() {
             این خودرو واقعاً <span className="text-[#E31C3D]">چقدر می‌ارزد؟</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl font-normal text-white/80 leading-relaxed max-w-lg">
-            Carno قیمت بازار را بررسی می‌کند تا بفهمی یک آگهی گران است، منصفانه است یا می‌تواند فرصت خرید باشد.
+            خودرکاب قیمت بازار را بررسی می‌کند تا بفهمی یک آگهی گران است، منصفانه است یا می‌تواند فرصت خرید باشد.
           </p>
         </div>
 

@@ -9,12 +9,12 @@ export function FooterSection() {
         <div className="flex flex-col gap-3 max-w-sm">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#E31C4E] rounded-lg flex items-center justify-center font-black text-white text-base shadow-sm">
-              C
+              K
             </div>
-            <span className="text-xl font-black text-white tracking-tight">کارنو</span>
+            <span className="text-xl font-black text-white tracking-tight">خودرکاب</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            کارنو؛ پلتفرم ارزیابی هوشمند خودرو. تحلیل فرصت‌های زیر قیمت و نشانه‌های واقعی بازار با عدد، نه با حدس.
+            خودرکاب؛ پلتفرم ارزیابی هوشمند خودرو. تحلیل فرصت‌های زیر قیمت و نشانه‌های واقعی بازار با عدد، نه با حدس.
           </p>
           <span className="text-xs text-slate-400 font-medium">
             توسعه‌یافته توسط تیم جی‌هاب (Jeyhub)

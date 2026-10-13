@@ -24,7 +24,7 @@ export function ProductPreview() {
         
         <Image 
           src="/images/dashboard-preview.jpg" 
-          alt="Carno Dashboard" 
+          alt="Khodrekab Dashboard" 
           fill
           className="object-cover object-top pt-12 group-hover:scale-[1.01] transition-transform duration-700 ease-in-out"
         />

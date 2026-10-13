@@ -28,11 +28,11 @@ export function EarlyAccessSection() {
           id="early-access-heading"
           className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4 leading-tight"
         >
-          می‌خواهی جزو نسل اول Carno باشی؟
+          می‌خواهی جزو نسل اول خودرکاب باشی؟
         </h2>
         
         <p className="text-sm sm:text-base text-slate-400 max-w-md mb-12 leading-relaxed">
-          نسخه اول کارنو را در کنار جمعی از خریداران هوشمند و فعالان بازار خودرو راه‌اندازی می‌کنیم.
+          نسخه اول خودرکاب را در کنار جمعی از خریداران هوشمند و فعالان بازار خودرو راه‌اندازی می‌کنیم.
         </p>
 
         {/* The Early Access Tier Card */}

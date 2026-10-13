@@ -10,7 +10,7 @@ export function Features() {
     },
     {
       title: 'شناخت فرصت‌های پنهان',
-      description: 'هوش مصنوعی کارنو، خودروهایی که زیر قیمت واقعی بازار قیمت‌گذاری شده‌اند را پیش از دیگران به شما نشان می‌دهد.',
+      description: 'هوش مصنوعی خودرکاب، خودروهایی که زیر قیمت واقعی بازار قیمت‌گذاری شده‌اند را پیش از دیگران به شما نشان می‌دهد.',
       icon: '🎯'
     },
     {
@@ -25,7 +25,7 @@ export function Features() {
   return (
     <section className="w-full py-32 px-6 bg-white relative">
       <div className="max-w-5xl mx-auto flex flex-col items-center relative z-10">
-        <h2 className="h2 mb-20 text-center text-slate-900">چرا کارنو یک ابزار لوکس نیست، یک ضرورت است؟</h2>
+        <h2 className="h2 mb-20 text-center text-slate-900">چرا خودرکاب یک ابزار لوکس نیست، یک ضرورت است؟</h2>
 
         <div className="flex flex-col md:flex-row justify-between gap-12 w-full">
           {features.map((feature, i) => (

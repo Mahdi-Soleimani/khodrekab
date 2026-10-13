@@ -1,4 +1,7 @@
 {
+  "id": "carno-payment-01",
+  "name": "Carno SMS Payment Workflow",
+  "active": false,
   "nodes": [
     {
       "parameters": {

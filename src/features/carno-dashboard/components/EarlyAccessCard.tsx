@@ -63,14 +63,14 @@ export function EarlyAccessCard({ status }: EarlyAccessCardProps) {
 
         {/* Heading */}
         <h2 className="text-2xl md:text-3xl text-white font-extrabold tracking-tight mt-1">
-          {isPaid ? 'دسترسی نسل اول فعال است ✓' : 'دسترسی نسل اول Carno'}
+          {isPaid ? 'دسترسی نسل اول فعال است ✓' : 'دسترسی نسل اول خودرکاب'}
         </h2>
 
         {/* Simple Truthful Explanation */}
         <p className="text-base md:text-lg text-slate-200 font-medium leading-relaxed">
           {isPaid 
-            ? 'دسترسی تو برای ورود زودتر به Carno فعال شده است.'
-            : 'برای ورود زودتر به Carno و قرار گرفتن در گروه کاربران نسل اول.'}
+            ? 'دسترسی تو برای ورود زودتر به خودرکاب فعال شده است.'
+            : 'برای ورود زودتر به خودرکاب و قرار گرفتن در گروه کاربران نسل اول.'}
         </p>
 
         {/* Price Row (Unpaid Only) */}

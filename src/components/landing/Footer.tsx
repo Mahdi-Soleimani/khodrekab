@@ -14,10 +14,10 @@ export function Footer() {
               height={40}
               className="rounded-lg shadow-sm"
             />
-            <span className="font-black text-xl text-slate-900 tracking-tight">کارنو</span>
+            <span className="font-black text-xl text-slate-900 tracking-tight">خودرکاب</span>
           </div>
           <p className="text-sm text-slate-500 leading-relaxed">
-            کارنو، دستیار هوشمند شما برای بررسی و تحلیل بازار خودرو. با ما با چشمان باز معامله کنید.
+            خودرکاب، دستیار هوشمند شما برای بررسی و تحلیل بازار خودرو. با ما با چشمان باز معامله کنید.
           </p>
         </div>
         

@@ -11,19 +11,19 @@ const vazirmatn = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "کارنو - دستیار هوشمند بازار خودرو",
+  title: "خودرکاب - دستیار هوشمند بازار خودرو",
   description: "قبل از خرید خودرو، بازار را بهتر بشناسید و فرصت‌های خرید ارزشمند را پیدا کنید.",
   openGraph: {
-    title: "کارنو - دستیار هوشمند بازار خودرو",
+    title: "خودرکاب - دستیار هوشمند بازار خودرو",
     description: "قبل از خرید خودرو، بازار را بهتر بشناسید و فرصت‌های خرید ارزشمند را پیدا کنید.",
-    url: "https://carno.ir",
-    siteName: "Carno",
+    url: "https://khodrekab.ir",
+    siteName: "Khodrekab",
     locale: "fa_IR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "کارنو - دستیار هوشمند بازار خودرو",
+    title: "خودرکاب - دستیار هوشمند بازار خودرو",
     description: "قبل از خرید خودرو، بازار را بهتر بشناسید و فرصت‌های خرید ارزشمند را پیدا کنید.",
   },
 };

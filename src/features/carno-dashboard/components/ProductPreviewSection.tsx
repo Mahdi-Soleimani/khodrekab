@@ -36,7 +36,7 @@ export function ProductPreviewSection() {
         </div>
         
         <h3 className="text-2xl md:text-3xl lg:text-4xl text-white font-extrabold tracking-tight">
-          وقتی Carno فعال شود، اینجا چه می‌بینی؟
+          وقتی خودرکاب فعال شود، اینجا چه می‌بینی؟
         </h3>
         
         <p className="text-base md:text-lg text-slate-200 font-medium max-w-3xl leading-relaxed">

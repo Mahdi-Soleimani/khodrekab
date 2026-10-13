@@ -9,10 +9,10 @@ export function BenefitsSection() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 id="benefits-heading" className="text-base font-semibold leading-7 text-indigo-600">Product Advantage</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Why Choose Carno Experience
+            Why Choose Khodrekab Experience
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Traditional car browsing is static and uninspiring. Carno transforms how users explore vehicles, combining cinematic quality with instant interactivity.
+            Traditional car browsing is static and uninspiring. Khodrekab transforms how users explore vehicles, combining cinematic quality with instant interactivity.
           </p>
         </div>
 

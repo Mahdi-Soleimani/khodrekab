@@ -31,7 +31,7 @@ export function Scene06_ProductReveal({ progress, active }: SceneProps) {
         {/* Title */}
         <div className="w-8 h-[2px] bg-[#E31C3D] mx-auto mb-6" />
         <h2 className="text-3xl md:text-4xl font-black text-[#111111] tracking-tight mb-10 leading-[1.3]">
-          ارزیابی جامع کارنو
+          ارزیابی جامع خودرکاب
         </h2>
         
         {/* Result grid — clean, no card wrappers */}

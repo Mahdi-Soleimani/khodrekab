@@ -51,7 +51,7 @@ export function CarnoExperience() {
               />
               <img
                 src={POSTER_ASSETS.desktop.src}
-                alt="کارنو - پیش‌نمایش خودرو"
+                alt="خودرکاب - پیش‌نمایش خودرو"
                 width={POSTER_ASSETS.desktop.width}
                 height={POSTER_ASSETS.desktop.height}
                 loading="eager"

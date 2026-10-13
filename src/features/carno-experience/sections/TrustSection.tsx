@@ -7,7 +7,7 @@ export function TrustSection() {
     {
       icon: '🏢',
       title: 'توسعه‌یافته توسط تیم جی‌هاب',
-      desc: 'کارنو محصولی تخصصی از تیم جی‌هاب (Jeyhub) برای ایجاد شفافیت داده‌محور در بازار معاملات خودرو است.',
+      desc: 'خودرکاب محصولی تخصصی از تیم جی‌هاب (Jeyhub) برای ایجاد شفافیت داده‌محور در بازار معاملات خودرو است.',
     },
     {
       icon: '⏳',
@@ -42,7 +42,7 @@ export function TrustSection() {
           id="trust-heading"
           className="text-2xl sm:text-4xl font-black text-center text-white tracking-tight mb-4"
         >
-          چرا کارنو را شفاف می‌سازیم؟
+          چرا خودرکاب را شفاف می‌سازیم؟
         </h2>
         <p className="text-sm sm:text-base text-slate-400 text-center mb-14 max-w-xl leading-relaxed">
           اعتماد، اولین پیش‌نیاز تصمیم‌گیری درست است. ما معتقدیم قبل از هر خریدی، ابزاری که استفاده می‌کنید باید کاملاً شفاف باشد.
