@@ -10,37 +10,19 @@ The landing page experience synchronizes user scroll position with an HTML5 Canv
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Scene1_Hero: Scroll Progress 0.00 - 0.16
-    Scene1_Hero --> Scene2_Wheels: Scroll Progress 0.16 - 0.35
-    Scene2_Wheels --> Scene3_Aero: Scroll Progress 0.35 - 0.55
-    Scene3_Aero --> Scene4_Rear: Scroll Progress 0.55 - 0.72
-    Scene4_Rear --> Scene5_Cabin: Scroll Progress 0.72 - 0.88
-    Scene5_Cabin --> Scene6_CTA: Scroll Progress 0.88 - 1.00
+    [*] --> Scene1_Hero: Progress 0.00 to 0.16
+    Scene1_Hero --> Scene2_Wheels: Progress 0.16 to 0.35
+    Scene2_Wheels --> Scene3_Aero: Progress 0.35 to 0.55
+    Scene3_Aero --> Scene4_Rear: Progress 0.55 to 0.72
+    Scene4_Rear --> Scene5_Cabin: Progress 0.72 to 0.88
+    Scene5_Cabin --> Scene6_CTA: Progress 0.88 to 1.00
 
-    state Scene1_Hero {
-        Frame_001_to_020: Front 3/4 Dynamic Profile
-        Copy1: "خرید و فروش شفاف خودرو"
-    }
-    state Scene2_Wheels {
-        Frame_021_to_042: Side Profile & Diamond Wheels
-        Copy2: "کارشناسی تخصصی و تضمین سلامت شاسی"
-    }
-    state Scene3_Aero {
-        Frame_043_to_065: Aerodynamic Roofline & Windshield
-        Copy3: "ارزیابی بیش از ۴۰۰ نقطه فنی و بدنه"
-    }
-    state Scene4_Rear {
-        Frame_066_to_086: Aggressive Rear Diffuser & Lighting
-        Copy4: "ضمانت بازگشت وجه در صورت مغایرت"
-    }
-    state Scene5_Cabin {
-        Frame_087_to_105: Interior Cockpit & Leather
-        Copy5: "تجربه رانندگی ایمن و تایید اصالت سند"
-    }
-    state Scene6_CTA {
-        Frame_106_to_120: Final Hero Stance
-        Copy6: "ثبت‌نام زودهنگام در باشگاه خودرکاب"
-    }
+    Scene1_Hero: Front Dynamic Profile (Frames 1-20)
+    Scene2_Wheels: Side Profile and Wheels (Frames 21-42)
+    Scene3_Aero: Aerodynamic Roofline (Frames 43-65)
+    Scene4_Rear: Rear Diffuser and Lighting (Frames 66-86)
+    Scene5_Cabin: Interior Cockpit (Frames 87-105)
+    Scene6_CTA: Final Hero Stance (Frames 106-120)
 ```
 
 ---

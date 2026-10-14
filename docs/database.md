@@ -14,15 +14,15 @@ erDiagram
     User ||--o{ PaymentIntent : "creates"
     User ||--o{ Session : "authenticates"
     User ||--o{ Event : "triggers"
-    User ||--o{ Referral : "invites (inviter)"
-    User ||--o| Referral : "invited (invitedUser)"
+    User ||--o{ Referral : "invites"
+    User ||--o| Referral : "invited"
     PaymentIntent ||--o{ PaymentLog : "audit trail"
 
     User {
         string id PK
-        string phone UK "Encrypted AES-GCM"
+        string phone UK
         boolean phoneVerified
-        enum status "WAITLIST | EARLY_ACCESS | ACTIVE | BLOCKED"
+        string status "WAITLIST or EARLY_ACCESS or ACTIVE"
         datetime createdAt
         datetime updatedAt
     }
@@ -32,20 +32,20 @@ erDiagram
         string userId FK
         string referralCode UK
         string referredBy
-        int priorityScore "Default: 10"
-        int pendingScore "Default: 0"
+        int priorityScore
+        int pendingScore
         datetime joinedAt
     }
 
     PaymentIntent {
         string id PK
         string userId FK
-        int amount "299,000 Tomans"
-        int uniqueCode "1-999 Unique Cent Offset"
-        int totalAmount "Amount + uniqueCode"
-        enum status "PENDING | PAID | FAILED | EXPIRED | REFUNDED"
-        string cardNumber "Masked 6037-****"
-        datetime expiresAt "15-minute countdown"
+        int amount
+        int uniqueCode
+        int totalAmount
+        string status "PENDING or PAID or EXPIRED"
+        string cardNumber
+        datetime expiresAt
         datetime confirmedAt
     }
 
@@ -53,18 +53,18 @@ erDiagram
         string id PK
         string inviterId FK
         string invitedUserId FK
-        enum status "CREATED | SIGNED_UP | VERIFIED | CONVERTED"
-        boolean isFlagged "Anti-abuse fraud gate"
+        string status "CREATED or VERIFIED or CONVERTED"
+        boolean isFlagged
         boolean isMatured
         datetime maturesAt
     }
 
     OTPVerification {
         string id PK
-        string phone "Normalized phone"
-        string codeHash "HMAC-SHA256 with pepper"
+        string phone
+        string codeHash
         datetime expiresAt
-        int attempts "Max 10"
+        int attempts
         boolean verified
     }
 ```

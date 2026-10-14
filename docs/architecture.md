@@ -39,16 +39,16 @@ graph TB
         BankCard["Iranian Shetab Banking / Card-to-Card"]
     end
 
-    Client -->|HTTPS / HTTP/2| Edge
-    Edge -->|/car-frames/**| StaticCache
-    Edge -->|Dynamic API & Pages| NextServer
-    NextServer -->|DML Queries (carno_app)| Postgres
-    NextServer -->|Queue / Rate-Limits / Cache| Redis
-    NextServer -->|Trigger Webhook| N8N
-    Worker -->|Read SMS Queue| Redis
-    Worker -->|Send OTP| MeliPayamak
-    N8N -->|Payment Webhook Callback| NextServer
-    N8N -->|Inbound SMS Ingress| NextServer
+    Client -->|"HTTPS / HTTP/2"| Edge
+    Edge -->|"Static Car Frames"| StaticCache
+    Edge -->|"Dynamic API & Pages"| NextServer
+    NextServer -->|"DML Queries via carno_app"| Postgres
+    NextServer -->|"Queue / Rate-Limits / Cache"| Redis
+    NextServer -->|"Trigger Webhook"| N8N
+    Worker -->|"Read SMS Queue"| Redis
+    Worker -->|"Send OTP"| MeliPayamak
+    N8N -->|"Payment Webhook Callback"| NextServer
+    N8N -->|"Inbound SMS Ingress"| NextServer
 ```
 
 ---

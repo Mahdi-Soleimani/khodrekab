@@ -34,20 +34,20 @@ To eliminate bot registrations, SMS balance depletion attacks, and automated scr
 sequenceDiagram
     autonumber
     actor Client as User Browser
-    participant Server as Next.js API (/api/security/pow)
+    participant Server as Next.js API
     participant Redis as Redis Cache
 
     Client->>Server: Request Challenge (GET /api/security/pow/challenge)
-    Server->>Server: Generate Nonce + Timestamp + HMAC Signature
-    Server-->>Client: { challenge, difficulty: 4, salt }
-    Note over Client: Web Worker solves PoW in ~300ms (100% transparent to user)
-    Client->>Server: Submit Form with Solution { challenge, nonce, payload }
-    Server->>Server: Validate Signature & Verify Leading Zeroes
-    Server->>Redis: Check if Challenge was already used (Replay Protection)
+    Server->>Server: Generate Nonce and HMAC Signature
+    Server-->>Client: Return Challenge and Target Difficulty
+    Note over Client: Web Worker solves PoW in ~300ms
+    Client->>Server: Submit Form with Solution Nonce
+    Server->>Server: Validate Signature and Verify Leading Zeroes
+    Server->>Redis: Check if Challenge was already used
     alt Challenge Replayed or Invalid
-        Server-->>Client: 403 Forbidden (Invalid or Replayed Proof-of-Work)
+        Server-->>Client: 403 Forbidden
     else Verification Passed
-        Server->>Server: Execute Business Logic (e.g., Send SMS OTP)
+        Server->>Server: Execute Business Logic (Send SMS OTP)
         Server-->>Client: 200 OK
     end
 ```
