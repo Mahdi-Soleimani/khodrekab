@@ -1,12 +1,39 @@
 {
   "name": "khodrekab",
   "version": "0.1.0",
+  "description": "Interactive Next.js 16 Automotive Experience & AI Valuation Platform",
   "private": true,
+  "homepage": "https://khodrekab.ir",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mahdi-Soleimani/khodrekab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mahdi-Soleimani/khodrekab/issues"
+  },
+  "author": "Mahdi Soleimani <https://github.com/Mahdi-Soleimani>",
+  "keywords": [
+    "nextjs",
+    "react19",
+    "typescript",
+    "canvas2d",
+    "gsap",
+    "prisma",
+    "postgresql",
+    "redis",
+    "khodrekab",
+    "automotive"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "worker:sms": "tsx scripts/sms-worker.ts",
     "maintenance:otp": "tsx scripts/maintenance-runner.ts",
     "ops:check": "tsx scripts/operational-check.ts"

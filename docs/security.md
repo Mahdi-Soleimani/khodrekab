@@ -1,6 +1,6 @@
 # Khodrekab Security Architecture & Zero-Trust Model
 
-This document outlines the multi-layered security architecture, cryptographic mechanisms, anti-abuse protections, and operational controls implemented in **Khodrekab** (`khodrekab.ir`).
+[← Back to README](../README.md) • [Architecture](architecture.md) • **Security** • [Database](database.md) • [State Machine](state-machine.md) • [Performance](performance.md)
 
 ---
 

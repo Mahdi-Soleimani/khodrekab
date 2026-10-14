@@ -22,6 +22,7 @@ paths = [
     '''(^|/)\.env\.runflare\.example$''',
     '''(^|/)n8n-payment-workflow\.example\.json$''',
     '''(^|/)secrets/redis_password\.txt\.example$''',
+    '''(^|/)docker-compose\.check\.yml$''',
     '''(^|/)scripts/test-.*\.ts$''',
     '''\.glb$''',
     '''\.blend1?$'''

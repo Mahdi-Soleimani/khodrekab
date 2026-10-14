@@ -1,6 +1,6 @@
 # Khodrekab State Machine Architecture
 
-This document formalizes the finite state machines (FSM) governing interactive car scrubbing, progressive asset hydration, user onboarding, and payment processing in **Khodrekab**.
+[← Back to README](../README.md) • [Architecture](architecture.md) • [Security](security.md) • [Database](database.md) • **State Machine** • [Performance](performance.md)
 
 ---
 

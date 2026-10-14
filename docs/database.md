@@ -1,6 +1,6 @@
 # Khodrekab Database Model & Concurrency Protocol
 
-This document details the relational data model, indexing strategy, transaction isolation levels, and concurrency protocols implemented in **Khodrekab** using PostgreSQL 16 and Prisma ORM.
+[← Back to README](../README.md) • [Architecture](architecture.md) • [Security](security.md) • **Database** • [State Machine](state-machine.md) • [Performance](performance.md)
 
 ---
 

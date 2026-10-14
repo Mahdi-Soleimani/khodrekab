@@ -2,18 +2,19 @@
 
 <div align="center">
 
+[![CI](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.6-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.8-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.0-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?style=for-the-badge&logo=redis)](https://redis.io/)
-[![Gitleaks](https://img.shields.io/badge/Security-Gitleaks_Audited-success?style=for-the-badge&logo=shield)](https://github.com/gitleaks/gitleaks)
 
 **Next-Generation Interactive Automotive Experience & Pre-order Platform**  
 *پلتفرم مدرن و تعاملی خودرویی با موتور رندر فریم‌های سینماتیک، معماری Zero-Trust و استقرار خودکفا*
 
-[Features](#-key-features) • [Architecture](#-architecture) • [Quickstart](#-quickstart) • [Engineering Docs](#-engineering-deep-dives) • [Deployment](#-deployment)
+[Features](#key-features) • [Architecture](#architecture) • [Quickstart](#quickstart) • [Engineering Specs](#engineering-deep-dives) • [Deployment](#production-deployment) • [Contributing](.github/CONTRIBUTING.md) • [Security](.github/SECURITY.md)
 
 </div>
 
@@ -227,7 +228,18 @@ docker run -d \
 
 ---
 
+## 🤝 Contributing & Community
+
+Contributions are what make the open-source and engineering community such an incredible place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+- 📖 **Contribution Guidelines:** Please read our [Contributing Guide](.github/CONTRIBUTING.md) for details on code style, branch naming, and Conventional Commits.
+- 🛡️ **Security Inquiries:** Review our [Security Policy](.github/SECURITY.md) to report vulnerabilities privately.
+- 🐛 **Issue Tracker:** Submit bug reports or request features via our [GitHub Issue Forms](https://github.com/Mahdi-Soleimani/khodrekab/issues/new/choose).
+
+---
+
 ## 📄 License & Intellectual Property
 
 Copyright © 2026 Khodrekab Team. All rights reserved.  
 The source code is published for evaluation, reference, and educational purposes.
+

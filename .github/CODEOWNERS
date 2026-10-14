@@ -1,0 +1,10 @@
+# Global Codeowners for Khodrekab
+* @Mahdi-Soleimani
+
+# Security and Infrastructure Critical Paths
+/src/lib/security/ @Mahdi-Soleimani
+/prisma/ @Mahdi-Soleimani
+/deploy/ @Mahdi-Soleimani
+/.github/workflows/ @Mahdi-Soleimani
+Dockerfile @Mahdi-Soleimani
+entrypoint.sh @Mahdi-Soleimani

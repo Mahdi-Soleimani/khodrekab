@@ -1,6 +1,6 @@
 # Khodrekab System Architecture
 
-This document describes the architectural foundation, engineering principles, and deployment topology of **Khodrekab** (`khodrekab.ir`), a high-performance interactive automotive platform built with Next.js, React 19, GSAP, Prisma, and PostgreSQL.
+[← Back to README](../README.md) • **Architecture** • [Security](security.md) • [Database](database.md) • [State Machine](state-machine.md) • [Performance](performance.md)
 
 ---
 

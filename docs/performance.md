@@ -1,6 +1,6 @@
 # Khodrekab Performance Engineering & Optimization
 
-This document outlines the performance benchmarks, canvas rendering optimizations, memory management protocols, and Core Web Vitals strategies engineered into **Khodrekab**.
+[← Back to README](../README.md) • [Architecture](architecture.md) • [Security](security.md) • [Database](database.md) • [State Machine](state-machine.md) • **Performance**
 
 ---
 

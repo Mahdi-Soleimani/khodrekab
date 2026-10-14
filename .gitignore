@@ -38,6 +38,8 @@ secrets/
 *.key
 *.pem
 cookies.txt
+docker-compose.check.yml
+docker-compose.override.yml
 
 # ------------------------------------------------------------------------------
 # 4. Database Dumps & Backups
