@@ -4,6 +4,9 @@
 
 [![CI](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml)
+[![Docker Build](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/docker-build.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/docker-build.yml)
+[![CodeQL](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/codeql.yml)
+[![Docs](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/docs-check.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/docs-check.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.6-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.8-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
