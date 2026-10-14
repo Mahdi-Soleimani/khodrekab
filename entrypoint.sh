@@ -16,7 +16,7 @@ echo "=================================================="
 # ------------------------------------------------------------------------------
 # 0. Global Paths & Environment Setup
 # ------------------------------------------------------------------------------
-CARNO_DATA_DIR="${CARNO_DATA_DIR:-/var/lib/carno-data}"
+CARNO_DATA_DIR="${KHODREKAB_DATA_DIR:-${CARNO_DATA_DIR:-/var/lib/carno-data}}"
 PG_DATA_DIR="$CARNO_DATA_DIR/postgres"
 REDIS_DATA_DIR="$CARNO_DATA_DIR/redis"
 N8N_DATA_DIR="$CARNO_DATA_DIR/n8n"
@@ -224,9 +224,9 @@ fi
 
 PG_RUNNING=1
 
-# Resolve database passwords securely
-CARNO_APP_PASS="${CARNO_APP_DB_PASSWORD:-carno_app_pass_secure_2026}"
-CARNO_MIGRATOR_PASS="${CARNO_MIGRATOR_DB_PASSWORD:-carno_migrator_pass_secure_2026}"
+# Resolve database passwords securely (KHODREKAB_* primary, CARNO_* legacy fallback)
+CARNO_APP_PASS="${KHODREKAB_APP_DB_PASSWORD:-${CARNO_APP_DB_PASSWORD:-carno_app_pass_secure_2026}}"
+CARNO_MIGRATOR_PASS="${KHODREKAB_MIGRATOR_DB_PASSWORD:-${CARNO_MIGRATOR_DB_PASSWORD:-carno_migrator_pass_secure_2026}}"
 
 # Ensure database 'carlanding' exists
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname = 'carlanding'\" | grep -q 1 || psql -c \"CREATE DATABASE carlanding;\""

@@ -81,6 +81,7 @@ docker-compose.override.yml
 cookies.txt
 car-frames-source-backup/
 carno-blender-pipeline/
+khodrekab-blender-pipeline/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 *.sqlite

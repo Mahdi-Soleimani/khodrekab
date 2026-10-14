@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { validateSessionToken, getSessionCookieConfig } from '@/lib/security/session';
 import { maskPhone } from '@/lib/sms/phone';
-import { CarnoDashboardView } from '@/features/carno-dashboard/pages/CarnoDashboardView';
-import { DashboardUserData } from '@/features/carno-dashboard/types/dashboard';
+import { KhodrekabDashboardView } from '@/features/khodrekab-dashboard/pages/KhodrekabDashboardView';
+import { DashboardUserData } from '@/features/khodrekab-dashboard/types/dashboard';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +13,8 @@ export default async function DashboardPage() {
   const cookieConfig = getSessionCookieConfig();
   const sessionToken = 
     cookieStore.get(cookieConfig.name)?.value ||
+    cookieStore.get('khodrekab_session')?.value ||
+    cookieStore.get('__Host-khodrekab_session')?.value ||
     cookieStore.get('carno_session')?.value ||
     cookieStore.get('__Host-carno_session')?.value ||
     cookieStore.get('token')?.value;
@@ -78,5 +80,5 @@ export default async function DashboardPage() {
     joinedAt: user.waitlistEntry.joinedAt.toISOString(),
   };
 
-  return <CarnoDashboardView user={dashboardUser} />;
+  return <KhodrekabDashboardView user={dashboardUser} />;
 }

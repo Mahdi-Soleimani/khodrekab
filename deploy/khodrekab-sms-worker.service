@@ -1,0 +1,23 @@
+[Unit]
+Description=Khodrekab Production SMS Worker Daemon (Singleton)
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=simple
+User=khodrekab
+Group=khodrekab
+WorkingDirectory=/var/www/khodrekab
+EnvironmentFile=/var/www/khodrekab/.env
+ExecStart=/usr/bin/npm run worker:sms
+Restart=always
+RestartSec=5s
+KillSignal=SIGTERM
+TimeoutStopSec=25s
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=khodrekab-sms-worker
+
+[Install]
+WantedBy=multi-user.target

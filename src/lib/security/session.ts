@@ -16,13 +16,14 @@ export interface SessionCookieConfig {
 
 /**
  * Single source of truth for session cookie configuration.
- * Production: __Host-carno_session (Secure, Path=/)
- * Development: carno_session
+ * Production: __Host-khodrekab_session (Secure, Path=/)
+ * Development: khodrekab_session
+ * (Legacy carno_session and __Host-carno_session remain fully supported as fallbacks)
  */
 export function getSessionCookieConfig(): SessionCookieConfig {
   const isProd = process.env.NODE_ENV === 'production';
   return {
-    name: isProd ? '__Host-carno_session' : 'carno_session',
+    name: isProd ? '__Host-khodrekab_session' : 'khodrekab_session',
     httpOnly: true,
     secure: isProd,
     sameSite: 'lax',
@@ -205,7 +206,13 @@ export async function validateSession(req: Request): Promise<SessionValidationRe
   const cookies = parseCookiesFromHeader(cookieHeader);
 
   const cookieConfig = getSessionCookieConfig();
-  const sessionToken = cookies[cookieConfig.name] || cookies['carno_session'] || cookies['__Host-carno_session'] || cookies['token'];
+  const sessionToken = 
+    cookies[cookieConfig.name] || 
+    cookies['khodrekab_session'] || 
+    cookies['__Host-khodrekab_session'] || 
+    cookies['carno_session'] || 
+    cookies['__Host-carno_session'] || 
+    cookies['token'];
 
   if (!sessionToken) {
     return {
