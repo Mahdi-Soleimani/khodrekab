@@ -26,7 +26,7 @@ graph TB
     end
 
     subgraph AppContainer ["Khodrekab Container (App + Services)"]
-        NextServer["Next.js 16 Runtime (Node.js 20)"]
+        NextServer["Next.js 16 Runtime (Node.js 24)"]
         Worker["SMS Dispatch Worker (tsx scripts/sms-worker.ts)"]
         CronRunner["Maintenance Runner (tsx scripts/maintenance-runner.ts)"]
         N8N["n8n Automation Engine (Loopback 127.0.0.1)"]

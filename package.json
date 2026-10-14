@@ -25,7 +25,7 @@
     "automotive"
   ],
   "engines": {
-    "node": ">=20.0.0",
+    "node": "^24.0.0",
     "npm": ">=10.0.0"
   },
   "scripts": {
@@ -57,7 +57,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
