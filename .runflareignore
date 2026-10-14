@@ -59,9 +59,12 @@ secrets/
 *.secret
 
 # Heavy raw assets and local database backups
+_private/
 car-frames-source-backup/
 carno-blender-pipeline/
+khodrekab-blender-pipeline/
 scripts/carno-assets/
+scripts/khodrekab-assets/raw/
 cookies.txt
 backup-*.sql
 backup-before-*.sql
@@ -82,4 +85,5 @@ README.md
 CLAUDE.md
 AGENTS.md
 CARNO_*.md
+KHODREKAB_*.md
 PHASE_*.md

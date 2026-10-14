@@ -109,7 +109,7 @@ Before submitting a Pull Request, ensure that all local quality gates pass:
    git push origin feat/my-awesome-feature
    ```
 2. Open a Pull Request against `main` on the upstream repository: `https://github.com/Mahdi-Soleimani/khodrekab`.
-3. Complete the [Pull Request Template](.github/pull_request_template.md) detailing:
+3. Complete the [Pull Request Template](pull_request_template.md) detailing:
    - What changes were made.
    - Why the change is necessary.
    - Evidence/benchmarks demonstrating the fix or feature.

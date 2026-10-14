@@ -1,4 +1,4 @@
-name: divarlanding
+name: khodrekab
 services:
   app:
     build: .

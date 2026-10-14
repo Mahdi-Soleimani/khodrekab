@@ -135,7 +135,7 @@ Khodrekab supports two deployment configurations:
 ### 5.1 Production Single-Container Architecture (Runflare / PaaS)
 Optimized for streamlined PaaS hosting with zero external database dependencies:
 - **Base Image:** `node:20-bookworm-slim` with PostgreSQL 16, Redis 7, and n8n pre-installed.
-- **Process Orchestration:** Handled via [entrypoint.sh](file:///Users/mahdi/Documents/DivarLanding/entrypoint.sh) with graceful shutdown traps (`SIGTERM`/`SIGINT`).
+- **Process Orchestration:** Handled via [entrypoint.sh](../entrypoint.sh) with graceful shutdown traps (`SIGTERM`/`SIGINT`).
 - **Data Persistence:** All databases, uploaded media, and configuration keys reside in the persistent mount `/var/lib/carno-data`.
 - **Network Isolation:** Internal services bind strictly to `127.0.0.1`. Only Next.js port `3000` is exposed to the reverse proxy.
 

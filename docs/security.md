@@ -109,7 +109,7 @@ GRANT ALL PRIVILEGES ON DATABASE carlanding TO carno_migrator;
 
 ## 6. HTTP Headers & Content Security Policy (CSP)
 
-Configured centrally in [next.config.ts](file:///Users/mahdi/Documents/DivarLanding/next.config.ts):
+Configured centrally in [next.config.ts](../next.config.ts):
 
 ```typescript
 const securityHeaders = [
@@ -131,5 +131,5 @@ const securityHeaders = [
 
 To guarantee that no credentials, tokens, or private keys are ever committed to the repository:
 1. **Local Pre-Commit Hook:** `.git/hooks/pre-commit` executes `gitleaks protect --staged` with Iranian bank card detection and n8n webhook rules. Any staged commit containing credentials is immediately aborted with exit code `1`.
-2. **GitHub Actions CI Pipeline:** `.github/workflows/gitleaks.yml` scans every push and pull request against [.gitleaks.toml](file:///Users/mahdi/Documents/DivarLanding/.gitleaks.toml).
-3. **Zero Secrets in History:** Production secrets (`.env`, `secrets/`, cookies, database backups) are permanently excluded from Git tracking via [.gitignore](file:///Users/mahdi/Documents/DivarLanding/.gitignore).
+2. **GitHub Actions CI Pipeline:** `.github/workflows/gitleaks.yml` scans every push and pull request against [.gitleaks.toml](../.gitleaks.toml).
+3. **Zero Secrets in History:** Production secrets (`.env`, `secrets/`, cookies, database backups) are permanently excluded from Git tracking via [.gitignore](../.gitignore).

@@ -43,6 +43,7 @@ secrets/
 deploy/
 scripts/test-*.ts
 CARNO_*.md
+KHODREKAB_*.md
 
 # Build artifacts generated locally
 .next
