@@ -13,7 +13,7 @@ We are committed to providing a welcoming, inclusive, and professional environme
 ## Development Workflow
 
 ### 1. Prerequisites
-- **Node.js:** v24.x (Active LTS)
+- **Node.js:** v24.x (LTS)
 - **npm:** v10.x or higher
 - **Docker & Docker Compose:** For running PostgreSQL and Redis services
 - **Gitleaks:** `brew install gitleaks` (for local pre-commit secret detection)
