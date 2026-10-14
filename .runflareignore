@@ -1,0 +1,89 @@
+# Dependencies
+node_modules/
+.npm/
+.pnp
+.pnp.js
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Next.js build artifacts
+.next/
+out/
+dist/
+build/
+coverage/
+
+# IDE & Editor files
+.vscode/
+.idea/
+.cursorrules
+.cursor/
+.antigravity/
+.agents/
+.claude/
+
+# Temporary & Cache files
+.cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+temp/
+tmp/
+*.swp
+*.swo
+*.bak
+*~
+.DS_Store
+Icon
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Secrets & Local environment
+.env
+.env.*
+!.env.example
+!.env.runflare.example
+secrets/
+.secrets/
+*.secret
+
+# Heavy raw assets and local database backups
+_private/
+car-frames-source-backup/
+carno-blender-pipeline/
+khodrekab-blender-pipeline/
+scripts/carno-assets/
+scripts/khodrekab-assets/raw/
+cookies.txt
+backup-*.sql
+backup-before-*.sql
+*.sqlite
+*.sqlite-journal
+*.db
+
+# Internal test & benchmark scripts
+scripts/test-*.ts
+benchmark.js
+generate-frames.js
+generate-mocks.js
+generate_frames.py
+optimize_frames.js
+
+# Project markdown documentation (not needed in production image)
+README.md
+CLAUDE.md
+AGENTS.md
+CARNO_*.md
+KHODREKAB_*.md
+PHASE_*.md

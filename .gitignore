@@ -1,0 +1,149 @@
+# ==============================================================================
+# KHODREKAB.IR — PRODUCTION & OPEN-SOURCE .GITIGNORE SPECIFICATION
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.npm
+
+# ------------------------------------------------------------------------------
+# 2. Next.js & Build Outputs
+# ------------------------------------------------------------------------------
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# 3. Environment Variables & Secrets (CRITICAL)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.runflare.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.local
+secrets/
+!secrets/redis_password.txt.example
+*.secret
+*.key
+*.pem
+cookies.txt
+docker-compose.check.yml
+docker-compose.override.yml
+
+# ------------------------------------------------------------------------------
+# 4. Database Dumps & Backups
+# ------------------------------------------------------------------------------
+*.sql
+*.dump
+*.sqlite
+*.sqlite-journal
+*.db
+!prisma/migrations/**/*.sql
+!prisma/bootstrap-roles.sql
+backup-*
+
+# ------------------------------------------------------------------------------
+# 5. Heavy 3D Sources, Raw Assets & Local Pipelines
+# ------------------------------------------------------------------------------
+khodrekab-blender-pipeline/
+carno-blender-pipeline/
+car-frames-source-backup/
+scripts/khodrekab-assets/raw/
+scripts/carno-assets/raw/
+*.blend
+*.blend1
+*.glb
+
+# ------------------------------------------------------------------------------
+# 6. Operational Workflows & Test Compose Configurations
+# ------------------------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.check.yml
+n8n-payment-workflow.json
+!n8n-payment-workflow.example.json
+
+# ------------------------------------------------------------------------------
+# 7. AI Assistants, Internal Audit Reports & Private Notes
+# ------------------------------------------------------------------------------
+_private/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.cursor/
+.cursorrules
+.antigravity/
+.agents/
+.claude/
+.gemini/
+KHODREKAB_*.md
+CARNO_*.md
+PHASE_*_PLAN.md
+khodrekab_PROMPT.md
+
+# ------------------------------------------------------------------------------
+# 8. Ad-hoc Generator & Benchmark Scripts
+# ------------------------------------------------------------------------------
+generate-frames.js
+generate-mocks.js
+generate_frames.py
+optimize_frames.js
+benchmark.js
+
+# ------------------------------------------------------------------------------
+# 9. Logs & Runtime Diagnostics
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# 10. Operating System & Editor Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*~
+
+# ------------------------------------------------------------------------------
+# 11. Legacy Carno Services & Unused Boilerplates
+# ------------------------------------------------------------------------------
+deploy/carno-*
+public/images/carno-logo.png
+public/file.svg
+public/globe.svg
+public/next.svg
+public/vercel.svg
+public/window.svg
+
+# ------------------------------------------------------------------------------
+# 12. Explicit Whitelist: Essential Public Production Assets (MUST REMAIN IN GIT)
+# ------------------------------------------------------------------------------
+!public/car-frames/v1/
+!public/car-frames/v1/**

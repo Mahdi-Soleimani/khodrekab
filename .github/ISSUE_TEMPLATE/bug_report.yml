@@ -1,0 +1,71 @@
+name: "🐛 Bug Report"
+description: "Report a bug or unexpected behavior in Khodrekab"
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please verify that this is not a security vulnerability. If it is a security issue, please read our [Security Policy](https://github.com/Mahdi-Soleimani/khodrekab/blob/main/.github/SECURITY.md) and report it privately.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of the system is failing?
+      options:
+        - "Canvas 2D Experience Engine / Frame Loader"
+        - "Waitlist Registration & Proof-of-Work (PoW)"
+        - "SMS OTP Dispatch / Worker Queue"
+        - "Payment Intent & Card-to-Card Reconciliation"
+        - "Database / PostgreSQL / Prisma"
+        - "Docker Container / Production Entrypoint"
+        - "UI / Layout / CSS / Responsive Design"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this behavior?
+      placeholder: |
+        1. Go to '/'
+        2. Scroll down to Frame 45
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs Actual Behavior
+      description: What did you expect to happen versus what actually happened?
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment & Device Details
+      description: OS, browser version, device model (e.g., iPhone 15 Safari iOS 18, macOS Chrome 130).
+      placeholder: "macOS Sonoma, Chrome 130"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs or Screenshots
+      description: Paste any browser console errors or server logs (please mask any personal data!).
+      render: shell

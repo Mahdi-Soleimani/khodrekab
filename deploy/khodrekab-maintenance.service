@@ -1,0 +1,14 @@
+[Unit]
+Description=Khodrekab PostgreSQL OTP Retention Maintenance Runner
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=khodrekab
+Group=khodrekab
+WorkingDirectory=/var/www/khodrekab
+EnvironmentFile=/var/www/khodrekab/.env
+ExecStart=/usr/bin/npm run maintenance:otp
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=khodrekab-maintenance

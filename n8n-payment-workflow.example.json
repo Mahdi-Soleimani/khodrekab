@@ -1,0 +1,86 @@
+{
+  "id": "khodrekab-payment-template",
+  "name": "Khodrekab SMS Payment Workflow Template",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sms-webhook",
+        "options": {}
+      },
+      "id": "1",
+      "name": "SMS Webhook Ingress",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "custom-sms-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const smsText = $input.item.json.body.message || '';\nconst sender = $input.item.json.body.sender || '';\n\n// Regex matching amount in Tomans (e.g. انتقال وجه ... مبلغ: 299,452)\nconst regex = /مبلغ:\\s*([\\d,]+)/;\nconst match = smsText.match(regex);\n\nif (match) {\n  const amount = parseInt(match[1].replace(/,/g, ''), 10);\n  return {\n    amount: amount,\n    referenceId: 'sms-' + Date.now(),\n    date: new Date().toISOString()\n  };\n}\n\nreturn null;"
+      },
+      "id": "2",
+      "name": "Parse Bank SMS Amount",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/payment/webhook",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"amount\": {{$json.amount}},\n  \"referenceId\": \"{{$json.referenceId}}\",\n  \"date\": \"{{$json.date}}\"\n}",
+        "options": {}
+      },
+      "id": "3",
+      "name": "Forward to Next.js API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        650,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "webhook-secret-placeholder",
+          "name": "Next.js Webhook Secret Header (x-webhook-secret)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "SMS Webhook Ingress": {
+      "main": [
+        [
+          {
+            "node": "Parse Bank SMS Amount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Bank SMS Amount": {
+      "main": [
+        [
+          {
+            "node": "Forward to Next.js API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

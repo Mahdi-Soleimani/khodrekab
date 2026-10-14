@@ -1,0 +1,59 @@
+name: Docker Production Build Verification
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "Dockerfile"
+      - "entrypoint.sh"
+      - "package*.json"
+      - "next.config.ts"
+      - "src/**"
+      - "public/**"
+      - "prisma/**"
+      - ".dockerignore"
+      - ".github/workflows/docker-build.yml"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "Dockerfile"
+      - "entrypoint.sh"
+      - "package*.json"
+      - "next.config.ts"
+      - "src/**"
+      - "public/**"
+      - "prisma/**"
+      - ".dockerignore"
+      - ".github/workflows/docker-build.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Verify Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Container Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: khodrekab:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke Test Image
+        run: |
+          echo "Verifying built container entrypoint and binary existence..."
+          docker run --rm --entrypoint /bin/sh khodrekab:ci-test -c "node -v && dumb-init --version"

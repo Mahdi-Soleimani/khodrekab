@@ -1,0 +1,109 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Docker & Container files
+Dockerfile*
+docker-compose*
+.dockerignore
+.docker/
+
+# Dependencies
+node_modules
+.npm
+.pnp
+.pnp.js
+
+# Development & Editor files
+.vscode
+.idea
+.cursorrules
+.cursor
+.antigravity
+.agents
+.claude
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+!.env.runflare.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.local
+secrets/
+.secrets/
+*.secret
+
+# Deployment & Test scripts
+deploy/
+scripts/test-*.ts
+CARNO_*.md
+KHODREKAB_*.md
+
+# Build artifacts generated locally
+.next
+out
+dist
+build
+coverage
+
+# Documentation not needed inside image
+README.md
+docs/
+*.md
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+*.pem
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files & Caches
+.cache
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+temp
+tmp
+*.swp
+*.swo
+*.bak
+*~
+
+# Project specific heavy assets & local database files
+_private/
+car-frames-source-backup/
+carno-blender-pipeline/
+khodrekab-blender-pipeline/
+cookies.txt
+*.sqlite
+*.sqlite-journal
+*.db
+
+*.sql
+backup-*.sql
+backup-before-c1.sql

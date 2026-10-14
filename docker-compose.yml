@@ -1,0 +1,85 @@
+name: khodrekab
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://carno_app:${CARNO_APP_DB_PASSWORD}@db:5432/carlanding?schema=public&connection_limit=15&pool_timeout=10&connect_timeout=5
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    secrets:
+      - redis_password
+    depends_on:
+      - db
+      - redis
+      - n8n
+
+  worker:
+    build: .
+    command: npm run worker:sms
+    restart: "on-failure:5"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://carno_app:${CARNO_APP_DB_PASSWORD}@db:5432/carlanding?schema=public&connection_limit=15&pool_timeout=10&connect_timeout=5
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    secrets:
+      - redis_password
+    depends_on:
+      - redis
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: carlanding
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7-alpine
+    command: >
+      sh -c '
+        if [ ! -s /run/secrets/redis_password ]; then
+          echo "FATAL: /run/secrets/redis_password is empty or missing" >&2;
+          exit 1;
+        fi;
+        find /data \! -user redis -exec chown redis:redis {} +;
+        exec /usr/bin/setpriv --reuid redis --regid redis --clear-groups sh -c "
+          printf \"appendonly yes\nappendfsync everysec\nmaxmemory 256mb\nmaxmemory-policy noeviction\nrequirepass %s\n\" \"\$(cat /run/secrets/redis_password)\" | exec redis-server -
+        "
+      '
+    secrets:
+      - redis_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6380:6379"
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=changeme
+      - WEBHOOK_URL=http://n8n:5678
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+secrets:
+  redis_password:
+    file: ./secrets/redis_password.txt
+
+volumes:
+  pgdata:
+  n8n_data:
+  redis_data:

@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum UserStatus {
+  WAITLIST
+  EARLY_ACCESS
+  ACTIVE
+  BLOCKED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum ReferralStatus {
+  CREATED
+  SIGNED_UP
+  VERIFIED
+  CONVERTED
+  FLAGGED_HIGH_VOLUME
+}
+
+model User {
+  id             String       @id @default(cuid())
+  phone          String       @unique
+  phoneVerified  Boolean      @default(false)
+  status         UserStatus   @default(WAITLIST)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  waitlistEntry  WaitlistEntry?
+  paymentIntents PaymentIntent[]
+  referralsSent  Referral[]   @relation("inviter")
+  referralUsed   Referral?    @relation("invited")
+  sessions       Session[]
+  events         Event[]
+}
+
+model WaitlistEntry {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  source         String?  // instagram, linkedin, direct, referral
+  referralCode   String   @unique
+  referredBy     String?  // userId of referrer
+  priorityScore  Int      @default(10)
+  pendingScore   Int      @default(0)
+  joinedAt       DateTime @default(now())
+
+  @@index([priorityScore(sort: Desc), joinedAt(sort: Asc)])
+}
+
+model OTPVerification {
+  id            String   @id @default(cuid())
+  phone         String
+  codeHash      String
+  expiresAt     DateTime
+  attempts      Int      @default(0)
+  verified      Boolean  @default(false)
+  pepperVersion Int      @default(1)
+  createdAt     DateTime @default(now())
+
+  @@index([phone, verified])
+}
+
+model OtpFailureCounter {
+  phoneHash   String    @id
+  windowStart DateTime
+  failCount   Int       @default(0)
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+}
+
+model PaymentIntent {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  amount          Int           // 299000
+  uniqueCode      Int           // 1-999
+  totalAmount     Int           // 299000 + uniqueCode
+  status          PaymentStatus @default(PENDING)
+  cardNumber      String?       // masked card used for payment
+  expiresAt       DateTime      // 15 min timeout
+  expiredAt       DateTime?
+  confirmedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  logs            PaymentLog[]
+
+  @@index([userId])
+  @@index([status, totalAmount])
+}
+
+model PaymentLog {
+  id         String   @id @default(cuid())
+  paymentId  String
+  payment    PaymentIntent @relation(fields: [paymentId], references: [id])
+  action     String   // CREATED, PAGE_OPENED, CONFIRMED, EXPIRED, REFUNDED
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([paymentId, createdAt(sort: Desc)])
+}
+
+model Referral {
+  id            String         @id @default(cuid())
+  inviterId     String
+  inviter       User           @relation("inviter", fields: [inviterId], references: [id])
+  invitedUserId String?        @unique
+  invitedUser   User?          @relation("invited", fields: [invitedUserId], references: [id])
+  status        ReferralStatus @default(CREATED)
+  ipHash        String?
+  deviceHash    String?
+  isFlagged     Boolean        @default(false)
+  isMatured     Boolean        @default(false)
+  maturesAt     DateTime?
+  createdAt     DateTime       @default(now())
+
+  @@index([inviterId, isMatured, maturesAt], map: "Referral_inviter_matured_idx")
+  @@index([inviterId, createdAt], map: "Referral_inviter_created_idx")
+}
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jti           String    @unique
+  ipHash        String?
+  userAgentHash String?
+  revokedAt     DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([expiresAt])
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  eventName  String
+  properties Json?
+  createdAt  DateTime @default(now())
+
+  @@index([eventName, createdAt])
+}

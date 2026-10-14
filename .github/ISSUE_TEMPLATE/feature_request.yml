@@ -1,0 +1,48 @@
+name: "✨ Feature Request"
+description: "Suggest an idea or architectural improvement for Khodrekab"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping make Khodrekab better! Please describe the feature you would like to see implemented.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - "Automotive 360° Visualization & Animation"
+        - "Waitlist Experience & User Onboarding"
+        - "Security & Anti-Abuse Engineering"
+        - "Payment & Financial Reconciliation"
+        - "Performance & Core Web Vitals"
+        - "DevOps, Docker & Self-Hosted Infrastructure"
+        - "Developer Experience & Tooling"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear description of what the problem or limitation is.
+      placeholder: I am frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / Architecture
+      description: Describe the solution you'd like to see implemented.
+      placeholder: A clear and concise description of what should happen...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.

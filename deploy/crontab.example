@@ -1,0 +1,10 @@
+# /etc/cron.d/carno-tasks or crontab -e
+# Ensure PATH includes node and npm binaries
+PATH=/usr/local/bin:/usr/bin:/bin
+SHELL=/bin/bash
+
+# 1. Daily OTP Retention Maintenance Runner (03:00 UTC)
+0 3 * * * carno cd /var/www/carno && npm run maintenance:otp >> /var/log/carno/maintenance.log 2>&1
+
+# 2. Hourly Operational Health & Queue Metric Check (every hour on the hour)
+0 * * * * carno cd /var/www/carno && npm run ops:check >> /var/log/carno/ops-check.log 2>&1
