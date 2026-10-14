@@ -1,0 +1,25 @@
+name: khodrekab-check
+
+services:
+  web:
+    image: khodrekab:check
+    container_name: khodrekab-check-web
+    ports:
+      - "3002:3000"
+    volumes:
+      - khodrekab_check_data:/var/lib/carno-data
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3002
+      - JWT_SECRET=db944bea0851f77946db9905ba306697b0b88bd5011685efd50e188e51261c59
+      - OTP_PEPPER=39e726c48be83381294c3b96e16a3ef593e5a24b27e77bcfac435298d9068934
+      - POW_SECRET_PEPPER=eb33b2ee58e3322205f8bdefc2e2af696de084bc4e594c080d3e4f5b99708bbb
+      - SMS_ENCRYPTION_KEY=54c769814b361da8d568a276f8a1e1afe50b5b6fe3e45a97b2941fb8ab022f84
+      - PAYMENT_WEBHOOK_SECRET=dev_payment_webhook_secret_32chars
+      - N8N_AUTH_SECRET=changeme_to_secure_secret
+      - ENABLE_N8N=false
+    restart: "no"
+
+volumes:
+  khodrekab_check_data:
+    name: khodrekab-check_data
