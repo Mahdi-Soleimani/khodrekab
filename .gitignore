@@ -130,7 +130,18 @@ Desktop.ini
 *~
 
 # ------------------------------------------------------------------------------
-# 11. Explicit Whitelist: Essential Public Production Assets (MUST REMAIN IN GIT)
+# 11. Legacy Carno Services & Unused Boilerplates
+# ------------------------------------------------------------------------------
+deploy/carno-*
+public/images/carno-logo.png
+public/file.svg
+public/globe.svg
+public/next.svg
+public/vercel.svg
+public/window.svg
+
+# ------------------------------------------------------------------------------
+# 12. Explicit Whitelist: Essential Public Production Assets (MUST REMAIN IN GIT)
 # ------------------------------------------------------------------------------
 !public/car-frames/v1/
 !public/car-frames/v1/**

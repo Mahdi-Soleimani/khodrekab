@@ -94,8 +94,10 @@ tmp
 *~
 
 # Project specific heavy assets & local database files
+_private/
 car-frames-source-backup/
 carno-blender-pipeline/
+khodrekab-blender-pipeline/
 cookies.txt
 *.sqlite
 *.sqlite-journal

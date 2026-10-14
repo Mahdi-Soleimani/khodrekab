@@ -1,0 +1,33 @@
+title = "Khodrekab Custom Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "iranian-shetab-card"
+description = "Detected Iranian Shetab Bank Card Number (16 digits)"
+regex = '''\b(6037|5892|6274|5022|6219|6393|6273|5057|6063|6396|6277|6280|5029|6276|6395|6220|5054|5058)\d{12}\b'''
+keywords = ["6037", "5892", "6274", "5022", "6219", "6393", "6273"]
+
+[[rules]]
+id = "n8n-webhook-endpoint"
+description = "Detected hardcoded n8n webhook URL with potential token/path"
+regex = '''https?://[a-zA-Z0-9.-]+:[0-9]+/webhook(?:-test)?/[a-zA-Z0-9_-]+'''
+keywords = ["webhook", "n8n"]
+
+[allowlist]
+description = "Global allowlist for example files, 3D binary assets, and mock test suites"
+paths = [
+    '''(^|/)\.env\.example$''',
+    '''(^|/)\.env\.runflare\.example$''',
+    '''(^|/)n8n-payment-workflow\.example\.json$''',
+    '''(^|/)secrets/redis_password\.txt\.example$''',
+    '''(^|/)scripts/test-.*\.ts$''',
+    '''\.glb$''',
+    '''\.blend1?$'''
+]
+regexes = [
+    '''YOUR_[A-Z_]+_HERE''',
+    '''changeme_[a-z_]+''',
+    '''your_[a-z_]+_password'''
+]
