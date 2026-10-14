@@ -66,7 +66,7 @@ async function testE2E() {
   }
   console.log('✅ Real referral code CR-9821 found in HTML');
 
-  if (!html.includes('فعال‌سازی دسترسی نسل اول Carno') && !html.includes('دسترسی نسل اول')) {
+  if (!html.includes('فعال‌سازی دسترسی نسل اول Khodrekab') && !html.includes('فعال‌سازی دسترسی نسل اول Carno') && !html.includes('دسترسی نسل اول')) {
     console.error('❌ Early access card not found in dashboard HTML');
     process.exit(1);
   }

@@ -55,7 +55,7 @@ export const KhodrekabDebugPanel: React.FC<KhodrekabDebugPanelProps> = ({ getDeb
       pointerEvents: 'none',
       width: '200px'
     }}>
-      <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#fff' }}>CARNO DEBUG</h3>
+      <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#fff' }}>KHODREKAB DEBUG</h3>
       
       <div style={{ marginBottom: '8px' }}>
         <span style={{ color: '#888' }}>Frame:</span>

@@ -1,7 +1,7 @@
 import { AssetResolver } from '../engine/loader/AssetResolver';
 import { FrameLoader } from '../engine/loader/FrameLoader';
 import { LoadQueue } from '../engine/loader/LoadQueue';
-import type { CarnoManifest } from '../engine/loader/types';
+import type { KhodrekabManifest } from '../engine/loader/types';
 import { BitmapCache } from '../engine/cache/BitmapCache';
 import { MemoryManager } from '../engine/cache/MemoryManager';
 import type { MemoryProfile } from '../engine/cache/types';
@@ -87,7 +87,7 @@ export class ExperienceSession {
   private resizeRaf: number | null = null;
   private ledger: ValidationLedger | null = null;
   private identity: AssetIdentity | null = null;
-  private manifest: CarnoManifest | null = null;
+  private manifest: KhodrekabManifest | null = null;
   private capacity = 0;
   private maxResidentSeen = 0;
   private handoff: HandoffState = 'pending';
@@ -99,11 +99,11 @@ export class ExperienceSession {
     liveSessions++;
     this.counted = true;
     mark('khodrekab:session-start');
-    let manifest: CarnoManifest;
+    let manifest: KhodrekabManifest;
     try {
       const res = await fetch(this.o.manifestPath, { signal: this.manifestAbort.signal });
       if (!res.ok) throw new Error(`Manifest HTTP ${res.status}`);
-      manifest = (await res.json()) as CarnoManifest;
+      manifest = (await res.json()) as KhodrekabManifest;
     } catch (err) {
       if (!this.disposed) {
         console.error('[Khodrekab] manifest load failed', err);
