@@ -43,7 +43,7 @@ export function DashboardHeader({ maskedPhone, avatarUrl }: DashboardHeaderProps
           <div className="flex items-center gap-3.5">
             <div className="h-10 w-10 relative overflow-hidden rounded-xl bg-[#E31C4E] flex items-center justify-center shadow-md shadow-rose-950/40">
               <Image 
-                src="/images/carno-logo.png" 
+                src="/images/khodrekab-logo.png" 
                 alt="Khodrekab Logo" 
                 width={36} 
                 height={36} 

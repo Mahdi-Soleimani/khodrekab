@@ -11,7 +11,7 @@ export function HeroSection({ children }: HeroSectionProps) {
     <div className="sticky top-0 w-full h-[100vh] overflow-hidden flex items-center justify-center bg-black">
       <div className="relative w-full h-full max-w-[1600px] flex items-center justify-center">
         
-        {/* Render the Carno Canvas behind all overlays */}
+        {/* Render the Khodrekab Canvas behind all overlays */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           {children}
         </div>

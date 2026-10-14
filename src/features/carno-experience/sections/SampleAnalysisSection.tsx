@@ -32,7 +32,7 @@ export function SampleAnalysisSection() {
               <span className="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true" />
               <span>نمونه نمایشی از خروجی خودرکاب</span>
             </span>
-            <span className="text-[11px] text-slate-400 font-mono">ID: CARNO-SAMPLE-PREVIEW</span>
+            <span className="text-[11px] text-slate-400 font-mono">ID: KHODREKAB-SAMPLE-PREVIEW</span>
           </div>
 
           <div className="pt-8">
