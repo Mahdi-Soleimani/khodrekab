@@ -80,12 +80,12 @@ Khodrekab implements a high-reliability card-to-card and gateway payment reconci
 
 ```mermaid
 stateDiagram-v2
-    [*] --> INTENT_CREATED: User clicks Reserve (Total = 299,000 + Unique Code)
+    [*] --> INTENT_CREATED: User clicks Reserve with Unique Offset
     INTENT_CREATED --> COUNTDOWN_ACTIVE: 15-Minute Timer starts in UI
 
     COUNTDOWN_ACTIVE --> SMS_WEBHOOK_RECEIVED: Bank sends transaction SMS to n8n
-    SMS_WEBHOOK_RECEIVED --> VERIFYING: Matches totalAmount + status == PENDING
-    VERIFYING --> PAID: Transaction confirmed atomically; User status -> EARLY_ACCESS
+    SMS_WEBHOOK_RECEIVED --> VERIFYING: Matches totalAmount and PENDING status
+    VERIFYING --> PAID: Transaction confirmed atomically to EARLY_ACCESS
 
     COUNTDOWN_ACTIVE --> EXPIRED: 15 minutes elapsed without matching transaction
     EXPIRED --> INTENT_CREATED: User generates fresh intent
