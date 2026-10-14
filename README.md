@@ -122,7 +122,7 @@ The `docs/` directory contains comprehensive, mathematically verified specificat
 ## 🚀 Quickstart
 
 ### Prerequisites
-- **Node.js:** v20.x or higher
+- **Node.js:** v24.x (Active LTS)
 - **Package Manager:** `npm` (or `pnpm`)
 - **Docker & Docker Compose:** For running local PostgreSQL and Redis
 
