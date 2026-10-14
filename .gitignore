@@ -1,42 +1,28 @@
-# Dependencies
+# ==============================================================================
+# KHODREKAB.IR — PRODUCTION & OPEN-SOURCE .GITIGNORE SPECIFICATION
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Dependencies & Package Managers
+# ------------------------------------------------------------------------------
 node_modules/
 .pnp
 .pnp.js
+.npm
 
-# Testing
-coverage/
-
-# Next.js build output
+# ------------------------------------------------------------------------------
+# 2. Next.js & Build Outputs
+# ------------------------------------------------------------------------------
 .next/
 out/
 build/
 dist/
+coverage/
+*.tsbuildinfo
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# OS files
-.DS_Store
-*.pem
-.AppleDouble
-.LSOverride
-Icon
-._*
-.Spotlight-V100
-.Trashes
-
-# Windows files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Environment Secrets & Local Overrides
+# ------------------------------------------------------------------------------
+# 3. Environment Variables & Secrets (CRITICAL)
+# ------------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
@@ -47,50 +33,104 @@ Desktop.ini
 .env.production.local
 .local
 secrets/
-.secrets/
+!secrets/redis_password.txt.example
 *.secret
+*.key
+*.pem
+cookies.txt
 
-# Cache & Temp
-.cache
-.npm
-.eslintcache
-.stylelintcache
-temp/
-tmp/
+# ------------------------------------------------------------------------------
+# 4. Database Dumps & Backups
+# ------------------------------------------------------------------------------
+*.sql
+*.dump
+*.sqlite
+*.sqlite-journal
+*.db
+!prisma/migrations/**/*.sql
+!prisma/bootstrap-roles.sql
+backup-*
 
-# IDE & Editor
-.vscode/
-.idea/
-.cursorrules
+# ------------------------------------------------------------------------------
+# 5. Heavy 3D Sources, Raw Assets & Local Pipelines
+# ------------------------------------------------------------------------------
+khodrekab-blender-pipeline/
+carno-blender-pipeline/
+car-frames-source-backup/
+scripts/khodrekab-assets/raw/
+scripts/carno-assets/raw/
+*.blend
+*.blend1
+*.glb
+
+# ------------------------------------------------------------------------------
+# 6. Operational Workflows & Test Compose Configurations
+# ------------------------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.check.yml
+n8n-payment-workflow.json
+!n8n-payment-workflow.example.json
+
+# ------------------------------------------------------------------------------
+# 7. AI Assistants, Internal Audit Reports & Private Notes
+# ------------------------------------------------------------------------------
+_private/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
 .cursor/
+.cursorrules
 .antigravity/
 .agents/
 .claude/
+.gemini/
+KHODREKAB_*.md
+CARNO_*.md
+PHASE_*_PLAN.md
+khodrekab_PROMPT.md
 
-# Docker Local Overrides
-docker-compose.override.yml
-.docker/
+# ------------------------------------------------------------------------------
+# 8. Ad-hoc Generator & Benchmark Scripts
+# ------------------------------------------------------------------------------
+generate-frames.js
+generate-mocks.js
+generate_frames.py
+optimize_frames.js
+benchmark.js
 
-# Temporary files
+# ------------------------------------------------------------------------------
+# 9. Logs & Runtime Diagnostics
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# 10. Operating System & Editor Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.vscode/
+.idea/
 *.swp
 *.swo
 *.bak
 *~
 
-# Project specific ignores
-cookies.txt
-car-frames-source-backup/
-carno-blender-pipeline/
-khodrekab-blender-pipeline/
-tsconfig.tsbuildinfo
-*.tsbuildinfo
-*.sqlite
-*.sqlite-journal
-*.db
-*.sql
-!prisma/migrations/**/*.sql
-!prisma/bootstrap-roles.sql
-backup-*.sql
-backup-before-c1.sql
-
-
+# ------------------------------------------------------------------------------
+# 11. Explicit Whitelist: Essential Public Production Assets (MUST REMAIN IN GIT)
+# ------------------------------------------------------------------------------
+!public/car-frames/v1/
+!public/car-frames/v1/**
