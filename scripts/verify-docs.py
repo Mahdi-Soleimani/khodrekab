@@ -10,7 +10,7 @@ import sys
 import glob
 
 def check_markdown_links():
-    md_files = glob.glob('docs/*.md') + glob.glob('.github/**/*.md', recursive=True) + ['README.md']
+    md_files = glob.glob('docs/*.md') + glob.glob('.github/**/*.md', recursive=True) + sorted(glob.glob('README*.md'))
     errors = []
     total_links = 0
 

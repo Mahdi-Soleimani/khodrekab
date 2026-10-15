@@ -1,6 +1,12 @@
+<div align="center">
+
+<img src="docs/images/banner.jpg" alt="Khodrekab Banner" width="100%" />
+
 # 🚗 Khodrekab (خودرکاب)
 
-<div align="center">
+<p align="center">
+  <b>English</b> • <a href="README.fa.md">فارسی</a>
+</p>
 
 [![CI](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/Mahdi-Soleimani/khodrekab/actions/workflows/gitleaks.yml)
@@ -17,7 +23,7 @@
 **Next-Generation Interactive Automotive Experience & Pre-order Platform**  
 *پلتفرم مدرن و تعاملی خودرویی با موتور رندر فریم‌های سینماتیک، معماری Zero-Trust و استقرار خودکفا*
 
-[Features](#key-features) • [Architecture](#architecture) • [Quickstart](#quickstart) • [Engineering Specs](#engineering-deep-dives) • [Deployment](#production-deployment) • [Contributing](.github/CONTRIBUTING.md) • [Security](.github/SECURITY.md)
+[Features](#key-features) • [Showcase](#-visual-showcase--user-journey) • [Architecture](#architecture) • [Quickstart](#quickstart) • [Engineering Specs](#engineering-deep-dives) • [Deployment](#production-deployment) • [Contributing](.github/CONTRIBUTING.md) • [Security](.github/SECURITY.md)
 
 </div>
 
@@ -34,6 +40,45 @@ Engineered with **Next.js 16 (App Router)** and **React 19**, Khodrekab combines
 [ Frame 001 ──► 020 ]  ──►  [ Frame 021 ──► 065 ]  ──►  [ Frame 066 ──► 120 ]
    Dynamic Scroll Scrubbing at 60 FPS • Dual Buffer HTML5 Canvas • Zero WebGL Overhead
 ```
+
+---
+
+## 📸 Visual Showcase & User Journey
+
+<table align="center" width="100%">
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/images/hero-valuation.png" alt="Intelligent Automotive Valuation" width="100%" />
+      <br />
+      <b>Intelligent Market Price & Valuation Engine</b>
+      <br />
+      <sub>Instant evaluation distinguishing overpriced, fair, and high-value vehicle deals.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/images/hero-deals.png" alt="Deal Opportunity Radar" width="100%" />
+      <br />
+      <b>Under-Market Deal Discovery Radar</b>
+      <br />
+      <sub>Algorithmic scanning to pinpoint underpriced opportunities before general market awareness.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/images/founder-access.png" alt="First-Gen Founder Access" width="100%" />
+      <br />
+      <b>Exclusive Founder Tier Pre-order Pass</b>
+      <br />
+      <sub>Queue bypass priority, verifiable Founder Badge profile credential, and engineering priority support.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/images/otp-verification.png" alt="Zero-Friction OTP Verification" width="100%" />
+      <br />
+      <b>Zero-Friction Cryptographic OTP Verification</b>
+      <br />
+      <sub>Rapid phone onboarding with anti-drain rate limiting and bot-resistant Proof-of-Work checks.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -173,7 +218,8 @@ khodrekab/
 │   ├── security.md              # Zero-Trust model, PoW & cryptography
 │   ├── database.md              # Prisma models & concurrency protocol
 │   ├── state-machine.md         # FSMs for scroller, OTP & payment
-│   └── performance.md           # Canvas optimization & Core Web Vitals
+│   ├── performance.md           # Canvas optimization & Core Web Vitals
+│   └── images/                  # Project banner, architectural screenshots & UI graphics
 ├── public/                      # Static assets & public media
 │   ├── car-frames/v1/           # 120 Desktop + 120 Mobile WebP frames + manifest.json
 │   └── images/                  # Badges, avatars, and UI graphics

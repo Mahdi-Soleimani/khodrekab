@@ -6,14 +6,14 @@ on:
     paths:
       - "docs/**"
       - ".github/**/*.md"
-      - "README.md"
+      - "README*.md"
       - "scripts/verify-docs.py"
   pull_request:
     branches: [ main ]
     paths:
       - "docs/**"
       - ".github/**/*.md"
-      - "README.md"
+      - "README*.md"
       - "scripts/verify-docs.py"
 
 concurrency:
